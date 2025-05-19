@@ -9,7 +9,7 @@ APP_OBJS = $(patsubst $(SRC_DIR)/%.c, $(OBJ_DIR)/%.o, $(APP_SRCS))
 MAIN_OBJ = $(OBJ_DIR)/main.o
 
 DEPS = $(patsubst $(SRC_DIR)/%.c, $(OBJ_DIR)/%.d, $(SRCS))
-TARGET = $(OBJ_DIR)/101$
+TARGET = $(OBJ_DIR)/101D
 
 # Compiler and flags
 CC = gcc
