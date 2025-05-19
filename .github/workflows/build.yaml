@@ -1,0 +1,30 @@
+name: Build and test project
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    env:
+      EXEC_NAME: '101$'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Setup GCC
+        run: sudo apt update && sudo apt install -y build-essential
+
+      - name: Setup directories
+        run: make setup
+
+      - name: Build project
+        run: make build
+
+      - name: Verify binary
+        run: test -f "out/${EXEC_NAME}" && echo "Build succeeded."
