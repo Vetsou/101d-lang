@@ -33,7 +33,7 @@ endif
 build: setup $(TARGET)
 
 run: setup $(TARGET)
-	$(TARGET)
+	$(TARGET) example/test.101d
 
 # Target
 $(TARGET): $(APP_OBJS) $(MAIN_OBJ)

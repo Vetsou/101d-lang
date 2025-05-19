@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      EXEC_NAME: '101D'
+      EXEC_PATH: 'build/101D'
 
     steps:
       - name: Checkout code
@@ -27,4 +27,4 @@ jobs:
         run: make build
 
       - name: Verify binary
-        run: test -f "out/${EXEC_NAME}" && echo "Build succeeded."
+        run: test -f "${EXEC_PATH}" && echo "Build succeeded."
