@@ -4,7 +4,13 @@
 #include "types.h"
 
 typedef enum {
-    TOK_EOF = 0, TOK_ERROR
+    TOK_EOF = 0, TOK_ERROR,
+
+    // Symbols
+    TOK_PLUS, TOK_MINUS, TOK_STAR, TOK_SLASH,
+    TOK_BANG, TOK_EQUAL, TOK_GREATER, TOK_LESS,
+    TOK_BANG_EQUAL, TOK_EQUAL_EQUAL, TOK_GREATER_EQUAL, TOK_LESS_EQUAL
+
 } token_type_t;
 
 typedef struct {

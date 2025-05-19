@@ -35,7 +35,7 @@ result_t process_file(const char *filepath) {
     token_t token;
     while (true) {
         token = lexer_scan(&lexer);
-        printf("Token[%d][L:%d][%s]\n", token.type, token.line, token.start);
+        printf("Token[%d][L:%d][%.*s]\n", token.type, token.line, token.length, token.start);
         if (token.type == TOK_EOF || token.type == TOK_ERROR) break;
     }
 

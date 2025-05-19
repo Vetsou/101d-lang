@@ -4,4 +4,13 @@
   block
   comment
 <#
-TEST_TOKEN
+
+# Symbols (No spaces)
++-*/
+!=><
+!===>=<=
+
+# Symbols (Spaces)
++ - * /
+! = > <
+!= == => <=

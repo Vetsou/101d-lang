@@ -37,6 +37,13 @@ static token_t token_error(
 // PRIVATE LEXER
 //
 
+static inline char _advance(
+    lexer_t *lexer
+) {
+    lexer->curr++;
+    return lexer->curr[-1];
+}
+
 static inline bool _is_file_end(
     lexer_t *lexer
 ) {
@@ -121,7 +128,29 @@ token_t lexer_scan(
     lexer_t *lexer
 ) {
     _skip_whitespace(lexer);
-    lexer->start = lexer->curr;
 
-    return token_create(TOK_EOF, lexer);
+    lexer->start = lexer->curr;
+    if (_is_file_end(lexer)) return token_create(TOK_EOF, lexer);
+
+    char curr_c = _advance(lexer);
+    switch (curr_c) {
+        case '+': return token_create(TOK_PLUS, lexer);
+        case '-': return token_create(TOK_MINUS, lexer);
+        case '/': return token_create(TOK_SLASH, lexer);
+        case '*': return token_create(TOK_STAR, lexer);
+        case '!':
+            return token_create(
+                _match_and_move(lexer, '=') ? TOK_BANG_EQUAL : TOK_BANG, lexer);
+        case '=':
+            return token_create(
+                _match_and_move(lexer, '=') ? TOK_EQUAL_EQUAL : TOK_EQUAL, lexer);
+        case '>':
+            return token_create(
+                _match_and_move(lexer, '=') ? TOK_GREATER_EQUAL : TOK_GREATER, lexer);
+        case '<':
+            return token_create(
+                _match_and_move(lexer, '=') ? TOK_LESS_EQUAL : TOK_LESS, lexer);
+    }
+
+    return token_error(lexer->curr_line, "Unexpected character.");
 }
