@@ -140,16 +140,49 @@ static token_t _handle_number(
     return _token_create(TOK_NUMBER, lexer);
 }
 
-static token_t _handle_identifier(
-    char first_char,
+static token_type_t _handle_keyword(
+    lexer_t *lexer,
+    int start,
+    int length,
+    const char *rest,
+    token_type_t type
+) {
+    if (lexer->curr - lexer->start == start + length &&
+        memcmp(lexer->start + start, rest, length) == 0
+    ) {
+        return type;
+    }
+    return TOK_IDENTIFIER;
+}
+
+static token_type_t _get_identifier_type(
     lexer_t *lexer
 ) {
     // Handle keywords
-    switch (first_char) {}
+    switch (lexer->start[0]) {
+        case 'V': return _handle_keyword(lexer, 1, 2, "AR", TOK_VAR);
+        case 'P': return _handle_keyword(lexer, 1, 3, "ROC", TOK_PROCEDURE);
+        case 'I': return _handle_keyword(lexer, 1, 1, "F", TOK_IF);
+        case 'T': return _handle_keyword(lexer, 1, 3, "HEN", TOK_THEN);
+        case 'E':
+            if (lexer->curr - lexer->start > 1) {
+                switch (lexer->start[1]) {
+                    case 'L': return _handle_keyword(lexer, 2, 2, "SE", TOK_ELSE);
+                    case 'N': return _handle_keyword(lexer, 2, 1, "D", TOK_END);
+                }
+            }
+    }
 
-    // Handle identifier (variable, func)
-    while (_is_ascii(*lexer->curr)) lexer->curr++;
-    return _token_create(TOK_IDENTIFIER, lexer);
+    // Not a keyword so handle identifier
+    return TOK_IDENTIFIER;
+}
+
+static token_t _handle_identifier(
+    lexer_t *lexer
+) {
+    while (_is_ascii(*lexer->curr) || _is_digit(*lexer->curr)) lexer->curr++;
+    token_type_t tok_type = _get_identifier_type(lexer);
+    return _token_create(tok_type, lexer);
 }
 
 //
@@ -181,7 +214,7 @@ token_t lexer_scan(
     char curr_c = _advance(lexer);
 
     if (_is_digit(curr_c)) return _handle_number(lexer);
-    if (_is_ascii(curr_c)) return _handle_identifier(curr_c, lexer);
+    if (_is_ascii(curr_c)) return _handle_identifier(lexer);
 
     switch (curr_c) {
         case '+': return _token_create(TOK_PLUS, lexer);

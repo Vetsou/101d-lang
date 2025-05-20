@@ -11,9 +11,12 @@ typedef enum {
     TOK_BANG, TOK_EQUAL, TOK_GREATER, TOK_LESS,
     TOK_BANG_EQUAL, TOK_EQUAL_EQUAL, TOK_GREATER_EQUAL, TOK_LESS_EQUAL,
 
+    // Keywords
+    TOK_IF, TOK_THEN, TOK_ELSE, TOK_END,
+    TOK_VAR, TOK_PROCEDURE,
+
     // Literals
     TOK_NUMBER, TOK_IDENTIFIER
-
 } token_type_t;
 
 typedef struct {

@@ -16,7 +16,15 @@
 != == => <=
 
 # Identifier
-my_func my_var
+my_func my_var VARmy VARVAR
+
+# Keywords
+VAR PROC
+
+# IF statement
+IF THEN
+END ELSE
+END
 
 # Numbers
 123 7665
