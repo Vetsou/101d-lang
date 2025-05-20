@@ -5,7 +5,7 @@
 // PRIVATE TOKEN
 //
 
-static token_t token_create(
+static token_t _token_create(
     token_type_t t_type,
     lexer_t *lexer
 ) {
@@ -19,7 +19,7 @@ static token_t token_create(
     return tok;
 }
 
-static token_t token_error(
+static token_t _token_error(
     int32_t line,
     const char *msg
 ) {
@@ -37,6 +37,20 @@ static token_t token_error(
 // PRIVATE LEXER
 //
 
+static inline bool _is_digit(
+    char c
+) {
+    return c >= '0' && c <= '9';
+}
+
+static inline bool _is_ascii(
+    char c
+) {
+    return (c >= 'a' && c <= 'z') ||
+           (c >= 'A' && c <= 'Z') ||
+            c == '_';
+}
+
 static inline char _advance(
     lexer_t *lexer
 ) {
@@ -48,6 +62,13 @@ static inline bool _is_file_end(
     lexer_t *lexer
 ) {
     return *lexer->curr == '\0';
+}
+
+static inline char _peek_next(
+    lexer_t *lexer
+) {
+    if (_is_file_end(lexer)) return '\0';
+    return lexer->curr[1];
 }
 
 static bool _match_and_move(
@@ -106,6 +127,31 @@ static void _skip_whitespace(
     }
 } 
 
+static token_t _handle_number(
+    lexer_t *lexer
+) {
+    while (_is_digit(*lexer->curr)) lexer->curr++;
+
+    if (*lexer->curr == '.' && _is_digit(_peek_next(lexer))) {
+        lexer->curr++;
+        while (_is_digit(*lexer->curr)) lexer->curr++;
+    }
+
+    return _token_create(TOK_NUMBER, lexer);
+}
+
+static token_t _handle_identifier(
+    char first_char,
+    lexer_t *lexer
+) {
+    // Handle keywords
+    switch (first_char) {}
+
+    // Handle identifier (variable, func)
+    while (_is_ascii(*lexer->curr)) lexer->curr++;
+    return _token_create(TOK_IDENTIFIER, lexer);
+}
+
 //
 // PUBLIC LEXER
 //
@@ -130,27 +176,31 @@ token_t lexer_scan(
     _skip_whitespace(lexer);
 
     lexer->start = lexer->curr;
-    if (_is_file_end(lexer)) return token_create(TOK_EOF, lexer);
+    if (_is_file_end(lexer)) return _token_create(TOK_EOF, lexer);
 
     char curr_c = _advance(lexer);
+
+    if (_is_digit(curr_c)) return _handle_number(lexer);
+    if (_is_ascii(curr_c)) return _handle_identifier(curr_c, lexer);
+
     switch (curr_c) {
-        case '+': return token_create(TOK_PLUS, lexer);
-        case '-': return token_create(TOK_MINUS, lexer);
-        case '/': return token_create(TOK_SLASH, lexer);
-        case '*': return token_create(TOK_STAR, lexer);
+        case '+': return _token_create(TOK_PLUS, lexer);
+        case '-': return _token_create(TOK_MINUS, lexer);
+        case '/': return _token_create(TOK_SLASH, lexer);
+        case '*': return _token_create(TOK_STAR, lexer);
         case '!':
-            return token_create(
+            return _token_create(
                 _match_and_move(lexer, '=') ? TOK_BANG_EQUAL : TOK_BANG, lexer);
         case '=':
-            return token_create(
+            return _token_create(
                 _match_and_move(lexer, '=') ? TOK_EQUAL_EQUAL : TOK_EQUAL, lexer);
         case '>':
-            return token_create(
+            return _token_create(
                 _match_and_move(lexer, '=') ? TOK_GREATER_EQUAL : TOK_GREATER, lexer);
         case '<':
-            return token_create(
+            return _token_create(
                 _match_and_move(lexer, '=') ? TOK_LESS_EQUAL : TOK_LESS, lexer);
     }
 
-    return token_error(lexer->curr_line, "Unexpected character.");
+    return _token_error(lexer->curr_line, "Unexpected character.");
 }
