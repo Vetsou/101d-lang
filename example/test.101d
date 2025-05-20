@@ -13,18 +13,31 @@
 # Symbols (Spaces)
 + - * /
 ! = > <
-!= == => <=
+== => <= <>
+|| &&
 
 # Identifier
 my_func my_var VARmy VARVAR
+FNnum
 
 # Keywords
-VAR PROC
+VAR FN PRINT
+NIL RET
 
 # IF statement
-IF THEN
-END ELSE
-END
+VAR a = 4
+VAR b = 12
+
+IF (a <> b) [
+  PRINT a
+] ELSE [
+  PRINT b
+]
+
+# Function syntax
+FN my_func_name() [
+  RET 0
+]
 
 # Numbers
 123 7665

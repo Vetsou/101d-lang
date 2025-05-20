@@ -161,16 +161,12 @@ static token_type_t _get_identifier_type(
     // Handle keywords
     switch (lexer->start[0]) {
         case 'V': return _handle_keyword(lexer, 1, 2, "AR", TOK_VAR);
-        case 'P': return _handle_keyword(lexer, 1, 3, "ROC", TOK_PROCEDURE);
+        case 'P': return _handle_keyword(lexer, 1, 4, "RINT", TOK_PRINT);
         case 'I': return _handle_keyword(lexer, 1, 1, "F", TOK_IF);
-        case 'T': return _handle_keyword(lexer, 1, 3, "HEN", TOK_THEN);
-        case 'E':
-            if (lexer->curr - lexer->start > 1) {
-                switch (lexer->start[1]) {
-                    case 'L': return _handle_keyword(lexer, 2, 2, "SE", TOK_ELSE);
-                    case 'N': return _handle_keyword(lexer, 2, 1, "D", TOK_END);
-                }
-            }
+        case 'F': return _handle_keyword(lexer, 1, 1, "N", TOK_FUNCTION);
+        case 'R': return _handle_keyword(lexer, 1, 2, "ET", TOK_RETURN);
+        case 'N': return _handle_keyword(lexer, 1, 2, "IL", TOK_NULL);
+        case 'E': return _handle_keyword(lexer, 1, 3, "LSE", TOK_ELSE);
     }
 
     // Not a keyword so handle identifier
@@ -221,9 +217,17 @@ token_t lexer_scan(
         case '-': return _token_create(TOK_MINUS, lexer);
         case '/': return _token_create(TOK_SLASH, lexer);
         case '*': return _token_create(TOK_STAR, lexer);
-        case '!':
-            return _token_create(
-                _match_and_move(lexer, '=') ? TOK_BANG_EQUAL : TOK_BANG, lexer);
+        case '(': return _token_create(TOK_LEFT_PAREN, lexer);
+        case ')': return _token_create(TOK_RIGHT_PAREN, lexer);
+        case '[': return _token_create(TOK_LEFT_BRACE, lexer);
+        case ']': return _token_create(TOK_RIGHT_BRACE, lexer);
+        case '!': return _token_create(TOK_BANG, lexer);
+        case '|':
+            if (_match_and_move(lexer, '|')) return _token_create(TOK_OR, lexer);
+            break;
+        case '&':
+            if (_match_and_move(lexer, '&')) return _token_create(TOK_AND, lexer);
+            break;
         case '=':
             return _token_create(
                 _match_and_move(lexer, '=') ? TOK_EQUAL_EQUAL : TOK_EQUAL, lexer);
@@ -231,8 +235,9 @@ token_t lexer_scan(
             return _token_create(
                 _match_and_move(lexer, '=') ? TOK_GREATER_EQUAL : TOK_GREATER, lexer);
         case '<':
-            return _token_create(
-                _match_and_move(lexer, '=') ? TOK_LESS_EQUAL : TOK_LESS, lexer);
+            if (_match_and_move(lexer, '=')) return _token_create(TOK_LESS_EQUAL, lexer);
+            else if (_match_and_move(lexer, '>')) return _token_create(TOK_UNEQUAL, lexer);
+            return _token_create(TOK_LESS, lexer);
     }
 
     return _token_error(lexer->curr_line, "Unexpected character.");
