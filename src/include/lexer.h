@@ -19,7 +19,7 @@ typedef enum {
     TOK_VAR, TOK_FUNCTION, TOK_RETURN,
 
     // Literals
-    TOK_NUMBER, TOK_IDENTIFIER
+    TOK_NUMBER, TOK_IDENTIFIER, TOK_STRING, TOK_TRUE, TOK_FALSE
 } token_type_t;
 
 typedef struct {

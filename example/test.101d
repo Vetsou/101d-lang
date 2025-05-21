@@ -24,10 +24,11 @@ FNnum
 VAR FN PRINT
 NIL RET
 
-# IF statement
+# Variable declaration
 VAR a = 4
 VAR b = 12
 
+# IF statement
 IF (a <> b) [
   PRINT a
 ] ELSE [
@@ -39,7 +40,17 @@ FN my_func_name() [
   RET 0
 ]
 
+# True and false
+TRUE FALSE
+
 # Numbers
 123 7665
 55.44 22.48576
 123456.7890
+
+# String
+"Single line string"
+"
+  Multi line
+  string
+"

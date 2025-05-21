@@ -140,6 +140,21 @@ static token_t _handle_number(
     return _token_create(TOK_NUMBER, lexer);
 }
 
+static token_t _handle_string(
+    lexer_t *lexer
+) {
+    while (*lexer->curr != '"' && !_is_file_end(lexer)) {
+        if (*lexer->curr == '\n') lexer->curr_line++;
+        lexer->curr++;
+    }
+
+    if (_is_file_end(lexer)) return _token_error(lexer->curr_line, "Unterminated string");
+
+    // Skip closing quote
+    lexer->curr++;
+    return _token_create(TOK_STRING, lexer);
+}
+
 static token_type_t _handle_keyword(
     lexer_t *lexer,
     int start,
@@ -163,10 +178,18 @@ static token_type_t _get_identifier_type(
         case 'V': return _handle_keyword(lexer, 1, 2, "AR", TOK_VAR);
         case 'P': return _handle_keyword(lexer, 1, 4, "RINT", TOK_PRINT);
         case 'I': return _handle_keyword(lexer, 1, 1, "F", TOK_IF);
-        case 'F': return _handle_keyword(lexer, 1, 1, "N", TOK_FUNCTION);
+        case 'F':
+            if (lexer->curr - lexer->start > 1) {
+                switch (lexer->start[1]) {
+                    case 'N': return TOK_FUNCTION;
+                    case 'A': return _handle_keyword(lexer, 2, 3, "LSE", TOK_FALSE);
+                }
+            }
+            break;
         case 'R': return _handle_keyword(lexer, 1, 2, "ET", TOK_RETURN);
         case 'N': return _handle_keyword(lexer, 1, 2, "IL", TOK_NULL);
         case 'E': return _handle_keyword(lexer, 1, 3, "LSE", TOK_ELSE);
+        case 'T': return _handle_keyword(lexer, 1, 3, "RUE", TOK_TRUE);
     }
 
     // Not a keyword so handle identifier
@@ -238,6 +261,9 @@ token_t lexer_scan(
             if (_match_and_move(lexer, '=')) return _token_create(TOK_LESS_EQUAL, lexer);
             else if (_match_and_move(lexer, '>')) return _token_create(TOK_UNEQUAL, lexer);
             return _token_create(TOK_LESS, lexer);
+
+        // Handle string
+        case '"': return _handle_string(lexer);
     }
 
     return _token_error(lexer->curr_line, "Unexpected character.");
