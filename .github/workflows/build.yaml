@@ -28,3 +28,9 @@ jobs:
 
       - name: Verify binary
         run: test -f "${EXEC_PATH}" && echo "Build succeeded."
+
+      - name: Build test modules
+        run: make build-all-tests
+
+      - name: Run test modules
+        run: make run-all-tests
