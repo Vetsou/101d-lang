@@ -43,6 +43,10 @@ FN my_func_name() [
 # True and false
 TRUE FALSE
 
+# Dot and comma
+,.
+, .
+
 # Numbers
 123 7665
 55.44 22.48576

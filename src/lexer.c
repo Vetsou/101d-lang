@@ -245,6 +245,8 @@ token_t lexer_scan(
         case '[': return _token_create(TOK_LEFT_BRACE, lexer);
         case ']': return _token_create(TOK_RIGHT_BRACE, lexer);
         case '!': return _token_create(TOK_BANG, lexer);
+        case ',': return _token_create(TOK_COMMA, lexer);
+        case '.': return _token_create(TOK_DOT, lexer);
         case '|':
             if (_match_and_move(lexer, '|')) return _token_create(TOK_OR, lexer);
             break;
