@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
+
 #include "lexer.h"
+#include "chunk.h"
 
 #define ASSERT(_e, ...) if (!(_e)) { fprintf(stderr, __VA_ARGS__); exit(1); }
 
@@ -50,6 +52,12 @@ int main(int argc, char *argv[]) {
             fprintf(stderr, "Error: Cannot process file [%s]\n", argv[i]);
         }
     }
+
+    // Testing TODO: Remove
+    chunk_t chunk;
+    chunk_init(&chunk);
+    chunk_write(&chunk, OP_RETURN);
+    chunk_free(&chunk);
 
     return 0;
 }
