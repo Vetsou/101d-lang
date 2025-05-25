@@ -78,9 +78,9 @@ TEST_TARGET_$(1) = $(TEST_OBJ)/test_$(1)
 
 .PHONY: test-$(1) run-test-$(1)
 
-test-$(1): test-setup $$(TEST_TARGET_$(1))
+test-$(1): test-setup build $$(TEST_TARGET_$(1))
 
-run-test-$(1): test-setup test-$(1)
+run-test-$(1): test-setup build test-$(1)
 	$$(TEST_TARGET_$(1))
 
 $$(TEST_OBJS_$(1)): $$(TEST_SRCS_$(1))

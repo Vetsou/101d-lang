@@ -157,8 +157,8 @@ static token_t _handle_string(
 
 static token_type_t _handle_keyword(
     lexer_t *lexer,
-    int start,
-    int length,
+    uint16_t start,
+    uint16_t length,
     const char *rest,
     token_type_t type
 ) {
