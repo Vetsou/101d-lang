@@ -3,10 +3,13 @@
 
 #include "lexer.h"
 #include "chunk.h"
+#include "debug.h"
 
 #define ASSERT(_e, ...) if (!(_e)) { fprintf(stderr, __VA_ARGS__); exit(1); }
 
-result_t process_file(const char *filepath) {
+result_t process_file(
+    const char *filepath
+) {
     FILE *file = fopen(filepath, "rb");
     if (file == NULL) {
         fprintf(stderr, "Could not open file [%s]\n", filepath);
@@ -44,7 +47,10 @@ result_t process_file(const char *filepath) {
     return RESULT_OK;
 }
 
-int main(int argc, char *argv[]) {
+int main(
+    int argc,
+    char *argv[]
+) {
     ASSERT(argc >= 2, "Error: Specify input files\n");
 
     for (int i = 1; i < argc; i++) {
@@ -57,6 +63,7 @@ int main(int argc, char *argv[]) {
     chunk_t chunk;
     chunk_init(&chunk);
     chunk_write(&chunk, OP_RETURN);
+    disassemble_chunk(&chunk, "TEST CHUNK");
     chunk_free(&chunk);
 
     return 0;
