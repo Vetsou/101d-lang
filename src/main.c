@@ -1,9 +1,9 @@
-#include <stdio.h>
-#include <stdlib.h>
-
 #include "lexer.h"
 #include "chunk.h"
 #include "debug.h"
+
+#include <stdio.h>
+#include <stdlib.h>
 
 #define ASSERT(_e, ...) if (!(_e)) { fprintf(stderr, __VA_ARGS__); exit(1); }
 
@@ -62,7 +62,13 @@ int main(
     // Testing TODO: Remove
     chunk_t chunk;
     chunk_init(&chunk);
+
+    int32_t constant = chunk_add_const(&chunk, 1.2);
+    chunk_write(&chunk, OP_CONSTANT);
+    chunk_write(&chunk, constant);
+
     chunk_write(&chunk, OP_RETURN);
+
     disassemble_chunk(&chunk, "TEST CHUNK");
     chunk_free(&chunk);
 
