@@ -7,6 +7,7 @@ void chunk_init(
     *chunk = (chunk_t) {
         .capacity = 0,
         .len = 0,
+        .lines = NULL,
         .code = NULL
     };
 
@@ -17,22 +18,27 @@ void chunk_free(
     chunk_t *chunk
 ) {
     ARRAY_FREE(uint8_t, chunk->code, chunk->capacity);
+    ARRAY_FREE(int32_t, chunk->lines, chunk->capacity);
     value_array_free(&chunk->consts);
     chunk_init(chunk);
 }
 
 void chunk_write(
     chunk_t *chunk,
-    uint8_t byte
+    uint8_t byte,
+    int32_t line
 ) {
     if (chunk->capacity < chunk->len + 1) {
         size_t prev_capacity = chunk->capacity;
         chunk->capacity = CAPACITY_GROW(prev_capacity);
         chunk->code = ARRAY_GROW(uint8_t, chunk->code,
             prev_capacity, chunk->capacity);
+        chunk->lines = ARRAY_GROW(int32_t, chunk->lines,
+            prev_capacity, chunk->capacity);
     }
 
     chunk->code[chunk->len] = byte;
+    chunk->lines[chunk->len] = line;
     chunk->len++;
 }
 

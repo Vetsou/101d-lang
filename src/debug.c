@@ -48,6 +48,11 @@ int disassemble_instr(
     size_t offset
 ) {
     printf("%04d ", offset);
+    if (offset > 0 && chunk->lines[offset] == chunk->lines[offset - 1]) {
+        printf("   | ");
+    } else {
+        printf("%4d ", chunk->lines[offset]);
+    }
 
     uint8_t instr = chunk->code[offset];
     switch (instr) {
