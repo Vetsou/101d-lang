@@ -4,6 +4,40 @@
 #include <stdio.h>
 
 //
+// LINE ITERATOR
+//
+
+void line_iter_init(
+    line_iter_t *iter,
+    const line_array_t *lines
+) {
+    *iter = (line_iter_t) {
+        .lines = lines,
+        .line_idx = 0,
+        .line_offset = 0,
+        .curr = -1,
+        .prev = -1
+    };
+}
+
+int32_t line_iter_advance(
+    line_iter_t *iter
+) {
+    iter->prev = iter->curr;
+    if (iter->line_idx >= iter->lines->len) return -1;
+
+    iter->curr = iter->lines->line_info[iter->line_idx].line;
+    iter->line_offset++;
+
+    if (iter->line_offset >= iter->lines->line_info[iter->line_idx].count) {
+        iter->line_idx++;
+        iter->line_offset = 0;
+    }
+
+    return iter->curr;
+}
+
+//
 // PRIVATE
 //
 
@@ -38,20 +72,26 @@ void disassemble_chunk(
     printf("===== %s =====\n", name);
 
     size_t offset = 0;
+    line_iter_t line_iter;
+    line_iter_init(&line_iter, &chunk->lines);
+
     while (offset < chunk->len) {
-        offset = disassemble_instr(chunk, offset);
+        offset = disassemble_instr(chunk, offset, &line_iter);
     }
 }
 
 int disassemble_instr(
     chunk_t *chunk,
-    size_t offset
+    size_t offset,
+    line_iter_t *iter
 ) {
     printf("%04d ", offset);
-    if (offset > 0 && chunk->lines[offset] == chunk->lines[offset - 1]) {
+
+    int32_t curr_line = line_iter_advance(iter);
+    if (offset > 0 && curr_line == iter->prev) {
         printf("   | ");
     } else {
-        printf("%4d ", chunk->lines[offset]);
+        printf("%4d ", curr_line);
     }
 
     uint8_t instr = chunk->code[offset];
