@@ -54,11 +54,15 @@ static int32_t const_instr(
     chunk_t *chunk,
     size_t offset
 ) {
-    uint8_t constant = chunk->code[offset + 1];
-    printf("%-16s %4d '", name, constant);
-    print_value(chunk->consts.values[constant]);
+    uint8_t h_const = chunk->code[offset + 1];
+    uint8_t l_const = chunk->code[offset + 2];
+
+    uint16_t const_idx = ((uint16_t)h_const << 8) | l_const;
+
+    printf("%-16s %5d '", name, const_idx);
+    print_value(chunk->consts.values[const_idx]);
     printf("'\n");
-    return offset + 2;
+    return offset + 3;
 }
 
 //

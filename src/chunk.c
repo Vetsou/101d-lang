@@ -1,6 +1,36 @@
 #include "chunk.h"
 #include "mem.h"
 
+//
+// PRIVATE
+//
+
+static int32_t chunk_add_const(
+    chunk_t *chunk,
+    cvalue_t value
+) {
+    value_array_write(&chunk->consts, value);
+    return chunk->consts.len - 1;
+}
+
+static void chunk_write(
+    chunk_t *chunk,
+    uint8_t byte
+) {
+    if (chunk->capacity < chunk->len + 1) {
+        size_t prev_capacity = chunk->capacity;
+        chunk->capacity = CAPACITY_GROW(prev_capacity);
+        chunk->code = ARRAY_GROW(uint8_t, chunk->code,
+            prev_capacity, chunk->capacity);
+    }
+
+    chunk->code[chunk->len++] = byte;
+}
+
+//
+// PUBLIC
+//
+
 void chunk_init(
     chunk_t *chunk
 ) {
@@ -23,29 +53,27 @@ void chunk_free(
     chunk_init(chunk);
 }
 
-void chunk_write(
+void chunk_write_instr(
     chunk_t *chunk,
-    uint8_t byte,
+    uint8_t opcode,
     int32_t line
 ) {
-    if (chunk->capacity < chunk->len + 1) {
-        size_t prev_capacity = chunk->capacity;
-        chunk->capacity = CAPACITY_GROW(prev_capacity);
-        chunk->code = ARRAY_GROW(uint8_t, chunk->code,
-            prev_capacity, chunk->capacity);
-    }
-
+    chunk_write(chunk, opcode);
     line_array_write(&chunk->lines, line);
-    chunk->code[chunk->len] = byte;
-    chunk->len++;
 }
 
-int32_t chunk_add_const(
+void chunk_write_const(
     chunk_t *chunk,
-    cvalue_t value
+    cvalue_t value,
+    int32_t line
 ) {
-    value_array_write(&chunk->consts, value);
-    return chunk->consts.len - 1;
+    int32_t const_idx = chunk_add_const(chunk, value);
+
+    chunk_write(chunk, OP_CONSTANT);
+    chunk_write(chunk, (const_idx >> 8) & 0xFF);
+    chunk_write(chunk, const_idx & 0xFF);
+
+    line_array_write(&chunk->lines, line);
 }
 
 int32_t chunk_get_line(

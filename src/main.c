@@ -63,11 +63,11 @@ int main(
     chunk_t chunk;
     chunk_init(&chunk);
 
-    int32_t constant = chunk_add_const(&chunk, 1.2);
-    chunk_write(&chunk, OP_CONSTANT, 123);
-    chunk_write(&chunk, constant, 123);
-
-    chunk_write(&chunk, OP_RETURN, 123);
+    chunk_write_const(&chunk, 1.22, 123);
+    chunk_write_const(&chunk, 321, 123);
+    chunk_write_const(&chunk, 1122, 123);
+    chunk_write_const(&chunk, 78, 124);
+    chunk_write_instr(&chunk, OP_RETURN, 126);
 
     disassemble_chunk(&chunk, "TEST CHUNK");
     chunk_free(&chunk);
