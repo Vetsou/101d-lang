@@ -69,7 +69,7 @@ else
 endif
 
 # Testing module names
-TEST_MODULES = lexer
+TEST_MODULES = lexer chunk
 
 define TEST_TEMPLATE
 TEST_SRCS_$(1) = $(TEST_DIR)/$(1)_tests.c
