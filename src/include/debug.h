@@ -15,6 +15,6 @@ void line_iter_init(line_iter_t *iter, const line_array_t *lines);
 int32_t line_iter_advance(line_iter_t *iter);
 
 void disassemble_chunk(chunk_t *chunk, const char *name);
-int disassemble_instr(chunk_t *chunk, size_t offset, line_iter_t *iter);
+int32_t disassemble_instr(chunk_t *chunk, size_t offset, line_iter_t *iter);
 
 #endif // _DEBUG_H_

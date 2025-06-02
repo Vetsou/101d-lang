@@ -64,10 +64,12 @@ int main(
     chunk_t chunk;
     chunk_init(&chunk);
 
-    chunk_write_const(&chunk, 1.22, 123);
-    chunk_write_const(&chunk, 321, 124);
-    chunk_write_const(&chunk, 997, 124);
-    chunk_write_instr(&chunk, OP_RETURN, 126);
+    chunk_write_const(&chunk, 1.5, 123);
+    chunk_write_const(&chunk, 400, 123);
+    chunk_write_instr(&chunk, OP_MULTIPLY, 123);
+    chunk_write_const(&chunk, 24.44, 124);
+
+    chunk_write_instr(&chunk, OP_RETURN, 125);
 
     vm_t vm;
     vm_init(&vm);

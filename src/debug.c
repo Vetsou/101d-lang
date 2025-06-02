@@ -84,7 +84,7 @@ void disassemble_chunk(
     }
 }
 
-int disassemble_instr(
+int32_t disassemble_instr(
     chunk_t *chunk,
     size_t offset,
     line_iter_t *iter
@@ -100,10 +100,13 @@ int disassemble_instr(
 
     uint8_t instr = chunk->code[offset];
     switch (instr) {
-        case OP_RETURN:
-            return simple_instr("OP_RETURN", offset);
-        case OP_CONSTANT:
-            return const_instr("OP_CONSTANT", chunk, offset);
+        case OP_CONSTANT: return const_instr("OP_CONSTANT", chunk, offset);
+        case OP_RETURN:   return simple_instr("OP_RETURN", offset);
+        case OP_NEGATE:   return simple_instr("OP_NEGATE", offset);
+        case OP_ADD:      return simple_instr("OP_ADD", offset);
+        case OP_SUBTRACT: return simple_instr("OP_SUBTRACT", offset);
+        case OP_MULTIPLY: return simple_instr("OP_MULTIPLY", offset);
+        case OP_DIVIDE:   return simple_instr("OP_DIVIDE", offset);
         default:
             printf("Unknown opcode %d\n", instr);
             return offset + 1;

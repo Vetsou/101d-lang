@@ -9,6 +9,12 @@
 // PRIVATE
 //
 
+static void reset_stack(
+    vm_t *vm
+) {
+    vm->stack_top = vm->stack;
+}
+
 static inline uint8_t read_byte(
     vm_t *vm
 ) {
@@ -24,28 +30,51 @@ static inline cvalue_t read_const(
 static interpret_result_t run_code(
     vm_t *vm
 ) {
-    uint8_t instr;
+#define BINARY_OP(op)                \
+    do {                             \
+        double b = vm_stack_pop(vm); \
+        double a = vm_stack_pop(vm); \
+        vm_stack_push(vm, a op b);   \
+    } while (false)
 
 #ifdef DEBUG_TRACE_EXEC
     line_iter_t line_iter;
     line_iter_init(&line_iter, &vm->chunk->lines);
 #endif
 
+    uint8_t instr;
     while(true) {
 
 #ifdef DEBUG_TRACE_EXEC
+    printf("          ");
+    for (cvalue_t *slot = vm->stack; slot < vm->stack_top; slot++) {
+        printf("[ ");
+        print_value(*slot);
+        printf(" ]");
+    }
+    printf("\n");
     disassemble_instr(vm->chunk, (size_t)(vm->b_ptr - vm->chunk->code), &line_iter);
 #endif
+
         switch (instr = read_byte(vm)) {
             case OP_CONSTANT: {
                 cvalue_t constant = read_const(vm);
+                vm_stack_push(vm, constant);
                 break;
             }
+            case OP_NEGATE:   vm_stack_push(vm, -vm_stack_pop(vm)); break;
+            case OP_ADD:      BINARY_OP(+); break;
+            case OP_SUBTRACT: BINARY_OP(-); break;
+            case OP_MULTIPLY: BINARY_OP(*); break;
+            case OP_DIVIDE:   BINARY_OP(/); break;
             case OP_RETURN: {
+                print_value(vm_stack_pop(vm));
                 return INTERPRET_OK;
             }
         }
     }
+
+#undef BINARY_OP
 }
 
 //
@@ -55,7 +84,7 @@ static interpret_result_t run_code(
 void vm_init(
     vm_t *vm
 ) {
-
+    reset_stack(vm);
 }
 
 interpret_result_t vm_interpret(
@@ -70,4 +99,19 @@ void vm_free(
     vm_t *vm
 ) {
 
+}
+
+void vm_stack_push(
+    vm_t *vm,
+    cvalue_t value
+) {
+    *vm->stack_top = value;
+    vm->stack_top++;
+}
+
+cvalue_t vm_stack_pop(
+    vm_t *vm
+) {
+    vm->stack_top--;
+    return *vm->stack_top;
 }
