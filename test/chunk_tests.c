@@ -48,7 +48,7 @@ void chunk_test_const() {
 
     TEST_ASSERT_EQUAL_INT(6, chunk.len); // 3 bytes per OP_CONST
     TEST_ASSERT_EQUAL_INT(2, chunk.lines.len);
-    
+
     TEST_ASSERT_EQUAL_INT(2, chunk.consts.len);
     TEST_ASSERT_EQUAL_INT(1.55, chunk.consts.values[0]);
     TEST_ASSERT_EQUAL_INT(1024, chunk.consts.values[1]);

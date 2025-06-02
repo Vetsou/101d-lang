@@ -1,6 +1,7 @@
 #include "lexer.h"
 #include "chunk.h"
 #include "debug.h"
+#include "vm.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -64,13 +65,15 @@ int main(
     chunk_init(&chunk);
 
     chunk_write_const(&chunk, 1.22, 123);
-    chunk_write_const(&chunk, 321, 123);
-    chunk_write_const(&chunk, 1122, 123);
-    chunk_write_const(&chunk, 78, 124);
+    chunk_write_const(&chunk, 321, 124);
+    chunk_write_const(&chunk, 997, 124);
     chunk_write_instr(&chunk, OP_RETURN, 126);
 
-    disassemble_chunk(&chunk, "TEST CHUNK");
-    chunk_free(&chunk);
+    vm_t vm;
+    vm_init(&vm);
+    vm_interpret(&vm, &chunk);
+    vm_free(&vm);
 
+    chunk_free(&chunk);
     return 0;
 }

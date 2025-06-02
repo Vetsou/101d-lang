@@ -1,6 +1,7 @@
 # Build dir
 build
 build-test
+build-debug
 
 # IDEs
 .vscode
