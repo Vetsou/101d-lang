@@ -1,7 +1,7 @@
 # Build dir
 build
 build-test
-build-debug
+build-release
 
 # IDEs
 .vscode

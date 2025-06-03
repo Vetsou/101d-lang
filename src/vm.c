@@ -9,10 +9,16 @@
 // PRIVATE
 //
 
-static void reset_stack(
+static inline void reset_stack(
     vm_t *vm
 ) {
     vm->stack_top = vm->stack;
+}
+
+static inline void vm_stack_negate_top(
+    vm_t *vm
+) {
+    vm->stack_top[-1] = -vm->stack_top[-1];
 }
 
 static inline uint8_t read_byte(
@@ -30,12 +36,15 @@ static inline cvalue_t read_const(
 static interpret_result_t run_code(
     vm_t *vm
 ) {
+
 #define BINARY_OP(op)                \
     do {                             \
         double b = vm_stack_pop(vm); \
         double a = vm_stack_pop(vm); \
         vm_stack_push(vm, a op b);   \
     } while (false)
+
+
 
 #ifdef DEBUG_TRACE_EXEC
     line_iter_t line_iter;
@@ -62,7 +71,7 @@ static interpret_result_t run_code(
                 vm_stack_push(vm, constant);
                 break;
             }
-            case OP_NEGATE:   vm_stack_push(vm, -vm_stack_pop(vm)); break;
+            case OP_NEGATE:   vm_stack_negate_top(vm); break;
             case OP_ADD:      BINARY_OP(+); break;
             case OP_SUBTRACT: BINARY_OP(-); break;
             case OP_MULTIPLY: BINARY_OP(*); break;
@@ -88,7 +97,8 @@ void vm_init(
 }
 
 interpret_result_t vm_interpret(
-    vm_t *vm, chunk_t *chunk
+    vm_t *vm,
+    chunk_t *chunk
 ) {
     vm->chunk = chunk;
     vm->b_ptr = chunk->code;
@@ -101,7 +111,7 @@ void vm_free(
 
 }
 
-void vm_stack_push(
+inline void vm_stack_push(
     vm_t *vm,
     cvalue_t value
 ) {
@@ -109,7 +119,7 @@ void vm_stack_push(
     vm->stack_top++;
 }
 
-cvalue_t vm_stack_pop(
+inline cvalue_t vm_stack_pop(
     vm_t *vm
 ) {
     vm->stack_top--;

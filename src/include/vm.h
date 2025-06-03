@@ -3,7 +3,7 @@
 
 #include "chunk.h"
 
-#define STACK_MAX 256
+#define STACK_MAX 4096
 
 typedef enum {
     INTERPRET_OK,

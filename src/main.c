@@ -67,7 +67,8 @@ int main(
     chunk_write_const(&chunk, 1.5, 123);
     chunk_write_const(&chunk, 400, 123);
     chunk_write_instr(&chunk, OP_MULTIPLY, 123);
-    chunk_write_const(&chunk, 24.44, 124);
+    chunk_write_instr(&chunk, OP_NEGATE, 123);
+    chunk_write_instr(&chunk, OP_NEGATE, 123);
 
     chunk_write_instr(&chunk, OP_RETURN, 125);
 

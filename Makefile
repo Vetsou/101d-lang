@@ -2,6 +2,10 @@
 # PROJECT CONFIG
 ##############################
 
+# BUILD MODES:
+# dev     - Standard build
+# debug   - Enables debug traces and logs
+# release - Builds with all optimizations
 BUILD_MODE ?= dev
 
 ##############################
@@ -10,12 +14,15 @@ BUILD_MODE ?= dev
 SRC_DIR = src
 VENDOR_DIR = vendor
 TEST_DIR = test
+OBJ_DIR = build
 
+# Setup variables for build modes
 ifeq ($(BUILD_MODE),debug)
-	OBJ_DIR = build-debug
 	EXTRA_CFLAGS = -DDEBUG_TRACE_EXEC
+else ifeq ($(BUILD_MODE),release)
+	EXTRA_CFLAGS = -O3 -DNDEBUG
+	OBJ_DIR = build-release
 else
-	OBJ_DIR = build
 	EXTRA_CFLAGS =
 endif
 
@@ -33,13 +40,13 @@ CC = gcc
 CFLAGS = -std=c99 -I$(SRC_DIR)/include -m64 -fanalyzer -Wall -Wextra -Wno-format $(EXTRA_CFLAGS)
 TEST_CFLAGS = -std=c99 -I$(SRC_DIR)/include -I$(VENDOR_DIR) -m64 -fanalyzer -Wall -Wextra -Wno-format
 
-##############################
-# PROJECT BUILD RULES
-##############################
-
-.PHONY: build run setup run-debug clean
-
 -include $(DEPS)
+
+##############################
+# SETUP
+##############################
+
+.PHONY: setup clean
 
 setup:
 ifeq ($(OS),Windows_NT)
@@ -51,18 +58,49 @@ endif
 clean:
 ifeq ($(OS),Windows_NT)
 	@if exist build rmdir /S /Q build
-	@if exist build-debug rmdir /S /Q build-debug
+	@if exist build-release rmdir /S /Q build-release
 else
-	@rm -rf build build-debug
+	@rm -rf build build-release
 endif
+
+##############################
+# DEV BUILD COMMANDS
+##############################
+
+.PHONY: build run
 
 build: setup $(TARGET)
 
 run: setup $(TARGET)
 	$(TARGET) example/test.101d
 
-run-debug:
+##############################
+# RELEASE BUILD COMMANDS
+##############################
+
+.PHONY: build-release run-release
+
+build-release: clean
+	$(MAKE) BUILD_MODE=release build
+
+run-release: clean
+	$(MAKE) BUILD_MODE=release run
+
+##############################
+# DEBUG BUILD COMMANDS
+##############################
+
+.PHONY: build-debug run-debug
+
+build-debug: clean
+	$(MAKE) BUILD_MODE=debug build
+
+run-debug: clean
 	$(MAKE) BUILD_MODE=debug run
+
+##############################
+# PROJECT BUILD RULES
+##############################
 
 # Target
 $(TARGET): $(APP_OBJS) $(MAIN_OBJ)
@@ -71,13 +109,6 @@ $(TARGET): $(APP_OBJS) $(MAIN_OBJ)
 # Objects
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 	$(CC) $(CFLAGS) -c $< -o $@
-
-##############################
-# PROJECT DEBUG RULES
-##############################
-
-DEBUG_CFLAGS = $(CFLAGS) -DDEBUG_TRACE_EXEC
-
 
 ##############################
 # TEST MODULES
