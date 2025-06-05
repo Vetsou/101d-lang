@@ -86,12 +86,18 @@ static bool _match_and_move(
 static void _handle_block_comment(
     lexer_t *lexer
 ) {
+    uint16_t block_counter = 1;
     while (!_is_file_end(lexer)) {
         switch (*lexer->curr) {
             case '\n': lexer->curr_line++; break;
+            case '#':
+                lexer->curr++;
+                if (_match_and_move(lexer, '>')) block_counter++;
+                break;
             case '<':
                 lexer->curr++;
-                if (_match_and_move(lexer, '#')) return;
+                if (_match_and_move(lexer, '#')) block_counter--;
+                if (block_counter == 0) return;
                 break;
         }
         lexer->curr++;
