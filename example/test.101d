@@ -5,6 +5,14 @@
   comment
 <#
 
+#>
+  Comment
+  #>Comment line<#
+  #>Comment#>test<#Comment<#
+  #>test<#test#>test<#
+  test
+<#
+
 # Symbols (No spaces)
 +-*/
 !=><

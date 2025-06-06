@@ -22,6 +22,13 @@ result_t process_file(
     rewind(file);
 
     char *file_buffer = (char *)malloc(sizeof(char) * (file_len + 1));
+    if (file_buffer == NULL) {
+        fprintf(stderr, "Error allocating memory\n");
+        fclose(file);
+        free(file_buffer);
+        return RESULT_FAIL;
+    }
+
     size_t read_size = fread(file_buffer, 1, file_len, file);
 
     if (read_size != file_len) {
