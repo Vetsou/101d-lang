@@ -217,14 +217,12 @@ static token_t _handle_identifier(
 
 void lexer_init(
     lexer_t *lexer,
-    char *chunk,
-    size_t len
+    const char *chunk
 ) {
     *lexer = (lexer_t) {
-        .curr = chunk,
-        .start = chunk,
+        .curr = (char *)chunk,
+        .start = (char *)chunk,
         .chunk = chunk,
-        .chunk_len = len,
         .curr_line = 1
     };
 }

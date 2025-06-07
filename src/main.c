@@ -1,8 +1,6 @@
-#include "lexer.h"
-#include "chunk.h"
+#include "compiler.h"
 #include "debug.h"
 #include "err.h"
-#include "vm.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -25,8 +23,9 @@ dl_result_t get_file_size(
     return DL_OK;
 }
 
-dl_result_t process_file(
-    const char *filepath
+dl_result_t read_file(
+    const char *filepath,
+    char **buffer
 ) {
     FILE *file = fopen(filepath, "rb");
     if (file == NULL) {
@@ -47,7 +46,6 @@ dl_result_t process_file(
     }
 
     size_t read_size = fread(file_buffer, 1, file_len, file);
-
     if (read_size != file_len) {
         fclose(file);
         free(file_buffer);
@@ -57,17 +55,21 @@ dl_result_t process_file(
     file_buffer[file_len] = '\0';
     fclose(file);
 
-    // Lexer
-    lexer_t lexer;
-    lexer_init(&lexer, file_buffer, read_size);
+    *buffer = file_buffer;
 
-    token_t token;
-    while (true) {
-        token = lexer_scan(&lexer);
-        printf("TOK [%d][L:%d][%.*s]\n", token.type, token.line, token.length, token.start);
-        if (token.type == TOK_EOF || token.type == TOK_ERROR) break;
-    }
+    return DL_OK;
+}
 
+dl_result_t process_file(
+    const char *filepath
+) {
+    char *src_buffer = NULL;
+    dl_result_t file_result = read_file(filepath, &src_buffer);
+    if (file_result != DL_OK) return file_result;
+
+    compile(src_buffer);
+
+    free(src_buffer);
     return DL_OK;
 }
 
@@ -84,23 +86,5 @@ int32_t main(
         }
     }
 
-    // Testing TODO: Remove
-    chunk_t chunk;
-    chunk_init(&chunk);
-
-    chunk_write_const(&chunk, 1.5, 123);
-    chunk_write_const(&chunk, 400, 123);
-    chunk_write_instr(&chunk, OP_MULTIPLY, 123);
-    chunk_write_instr(&chunk, OP_NEGATE, 123);
-    chunk_write_instr(&chunk, OP_NEGATE, 123);
-
-    chunk_write_instr(&chunk, OP_RETURN, 125);
-
-    vm_t vm;
-    vm_init(&vm);
-    vm_interpret(&vm, &chunk);
-    vm_free(&vm);
-
-    chunk_free(&chunk);
     return DL_OK;
 }

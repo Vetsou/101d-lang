@@ -33,12 +33,11 @@ typedef struct {
 typedef struct {
     char *curr;
     char *start;
-    char *chunk;
-    size_t chunk_len;
+    const char *chunk;
     int32_t curr_line;
 } lexer_t;
 
-void lexer_init(lexer_t *lexer, char *chunk, size_t len);
+void lexer_init(lexer_t *lexer, const char *chunk);
 token_t lexer_scan(lexer_t *lexer);
 
 #endif // _LEXER_H_
