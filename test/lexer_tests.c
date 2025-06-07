@@ -28,7 +28,7 @@ void test_partial_keywords() {
     };
 
     lexer_t lexer;
-    lexer_init(&lexer, "FNmy VARiable ELSEs", 20);
+    lexer_init(&lexer, "FNmy VARiable ELSEs");
     check_tokens(&lexer, expected);
 }
 
@@ -40,7 +40,7 @@ void test_function() {
     };
 
     lexer_t lexer;
-    lexer_init(&lexer, "FN my_func_name() [\nRET 0\n]", 28);
+    lexer_init(&lexer, "FN my_func_name() [\nRET 0\n]");
     check_tokens(&lexer, expected);
 }
 
@@ -55,7 +55,7 @@ void test_if() {
     };
 
     lexer_t lexer;
-    lexer_init(&lexer, "IF (a <> b) [\nPRINT a\n]", 24);
+    lexer_init(&lexer, "IF (a <> b) [\nPRINT a\n]");
     check_tokens(&lexer, expected);
 }
 
@@ -66,7 +66,7 @@ void test_variable() {
     };
 
     lexer_t lexer;
-    lexer_init(&lexer, "VAR a = 4", 10);
+    lexer_init(&lexer, "VAR a = 4");
     check_tokens(&lexer, expected);
 }
 
@@ -79,7 +79,7 @@ void test_math_expression() {
     };
 
     lexer_t lexer;
-    lexer_init(&lexer, "3 + 7 * (2 - 3) / 3", 20);
+    lexer_init(&lexer, "3 + 7 * (2 - 3) / 3");
     check_tokens(&lexer, expected);
 }
 
@@ -95,8 +95,7 @@ void test_strings() {
         "\"normal string\"\n"
         "\"string with # comment\"\n"
         "\"string with #> comment <# and #>#>works<#<#\"\n"
-        "\"string with keywords IF VAR > < + *\"",
-        124
+        "\"string with keywords IF VAR > < + *\""
     );
 
     check_tokens(&lexer, expected);
@@ -106,7 +105,7 @@ void test_comment() {
     token_type_t expected[] = { TOK_NUMBER, TOK_EOF };
 
     lexer_t lexer;
-    lexer_init(&lexer, "# Some comment\n123", 19);
+    lexer_init(&lexer, "# Some comment\n123");
     check_tokens(&lexer, expected);
 }
 
@@ -114,7 +113,7 @@ void test_block_comment() {
     token_type_t expected[] = { TOK_VAR, TOK_EOF };
 
     lexer_t lexer;
-    lexer_init(&lexer, "#> \nBlock\ncomment\n123\n <# VAR", 30);
+    lexer_init(&lexer, "#> \nBlock\ncomment\n123\n <# VAR");
     check_tokens(&lexer, expected);
 }
 
@@ -127,8 +126,7 @@ void test_multiple_block_comments() {
         "#>\n"
         "#> Test comment <#\n"
         "#>#>Double comment<#<#\n"
-        "<<>> end<# IF",
-        59
+        "<<>> end<# IF"
     );
     check_tokens(&lexer, expected);
 }
