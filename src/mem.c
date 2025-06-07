@@ -1,5 +1,6 @@
 #include "mem.h"
 
+#include "err.h"
 #include <stdlib.h>
 
 void* mem_realloc(
@@ -15,6 +16,6 @@ void* mem_realloc(
     }
 
     void *result = realloc(pointer, new_size);
-    if (result == NULL) exit(RESULT_FAIL);
+    if (result == NULL) exit(DL_MEMORY_ALLOC_ERR);
     return result;
 }

@@ -22,6 +22,16 @@ void check_tokens(lexer_t *lexer, token_type_t *expected_types) {
     TESTS
 ********************/
 
+void test_partial_keywords() {
+    token_type_t expected[] = {
+        TOK_IDENTIFIER, TOK_IDENTIFIER, TOK_IDENTIFIER, TOK_EOF
+    };
+
+    lexer_t lexer;
+    lexer_init(&lexer, "FNmy VARiable ELSEs", 20);
+    check_tokens(&lexer, expected);
+}
+
 void test_function() {
     token_type_t expected[] = {
         TOK_FUNCTION, TOK_IDENTIFIER, TOK_LEFT_PAREN, TOK_RIGHT_PAREN,
@@ -127,6 +137,7 @@ int main(void) {
     printf("#################### [LEXER TESTS] ####################\n");
     UNITY_BEGIN();
 
+    RUN_TEST(test_partial_keywords);
     RUN_TEST(test_function);
     RUN_TEST(test_if);
     RUN_TEST(test_variable);

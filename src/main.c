@@ -1,6 +1,7 @@
 #include "lexer.h"
 #include "chunk.h"
 #include "debug.h"
+#include "err.h"
 #include "vm.h"
 
 #include <stdio.h>
@@ -8,34 +9,49 @@
 
 #define ASSERT(_e, ...) if (!(_e)) { fprintf(stderr, __VA_ARGS__); exit(1); }
 
-result_t process_file(
+dl_result_t get_file_size(
+    FILE *file,
+    size_t *out_len
+) {
+    if (fseek(file, 0, SEEK_END) != 0) return DL_FILE_OPER_ERR;
+
+    long file_len = ftell(file);
+
+    if (file_len == -1L) return DL_FILE_OPER_ERR;
+    if (fseek(file, 0, SEEK_SET) != 0) return DL_FILE_OPER_ERR;
+
+    *out_len = (size_t)file_len;
+
+    return DL_OK;
+}
+
+dl_result_t process_file(
     const char *filepath
 ) {
     FILE *file = fopen(filepath, "rb");
     if (file == NULL) {
-        fprintf(stderr, "Could not open file [%s]\n", filepath);
-        return RESULT_FAIL;
+        return DL_FILE_OPEN_ERR;
     }
 
-    fseek(file, 0, SEEK_END);
-    size_t file_len = ftell(file);
-    rewind(file);
+    size_t file_len;
+    if (get_file_size(file, &file_len) != DL_OK) {
+        fclose(file);
+        return DL_FILE_OPER_ERR;
+    }
 
     char *file_buffer = (char *)malloc(sizeof(char) * (file_len + 1));
     if (file_buffer == NULL) {
-        fprintf(stderr, "Error allocating memory\n");
         fclose(file);
         free(file_buffer);
-        return RESULT_FAIL;
+        return DL_MEMORY_ALLOC_ERR;
     }
 
     size_t read_size = fread(file_buffer, 1, file_len, file);
 
     if (read_size != file_len) {
-        fprintf(stderr, "Error reading file [%s]\n", filepath);
         fclose(file);
         free(file_buffer);
-        return RESULT_FAIL;
+        return DL_FILE_READ_ERR;
     }
 
     file_buffer[file_len] = '\0';
@@ -52,18 +68,19 @@ result_t process_file(
         if (token.type == TOK_EOF || token.type == TOK_ERROR) break;
     }
 
-    return RESULT_OK;
+    return DL_OK;
 }
 
-int main(
-    int argc,
+int32_t main(
+    int32_t argc,
     char *argv[]
 ) {
     ASSERT(argc >= 2, "Error: Specify input files\n");
 
-    for (int i = 1; i < argc; i++) {
-        if (process_file(argv[i]) == RESULT_FAIL) {
-            fprintf(stderr, "Error: Cannot process file [%s]\n", argv[i]);
+    for (int32_t i = 1; i < argc; i++) {
+        dl_result_t result = process_file(argv[i]);
+        if (result != DL_OK) {
+            fprintf(stderr, "Error [Code: %d]: Cannot process file [%s]\n", result, argv[i]);
         }
     }
 
@@ -85,5 +102,5 @@ int main(
     vm_free(&vm);
 
     chunk_free(&chunk);
-    return 0;
+    return DL_OK;
 }

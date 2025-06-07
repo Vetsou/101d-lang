@@ -188,7 +188,7 @@ static token_type_t _get_identifier_type(
         case 'F':
             if (lexer->curr - lexer->start > 1) {
                 switch (lexer->start[1]) {
-                    case 'N': return TOK_FUNCTION;
+                    case 'N': return _handle_keyword(lexer, 2, 0, "", TOK_FUNCTION);
                     case 'A': return _handle_keyword(lexer, 2, 3, "LSE", TOK_FALSE);
                 }
             }
