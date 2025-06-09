@@ -41,7 +41,7 @@ int32_t line_iter_advance(
 // PRIVATE
 //
 
-static int32_t simple_instr(
+static int32_t _simple_instr(
     const char *name,
     size_t offset
 ) {
@@ -49,7 +49,7 @@ static int32_t simple_instr(
     return offset + 1;
 }
 
-static int32_t const_instr(
+static int32_t _const_instr(
     const char *name,
     chunk_t *chunk,
     size_t offset
@@ -100,13 +100,13 @@ int32_t disassemble_instr(
 
     uint8_t instr = chunk->code[offset];
     switch (instr) {
-        case OP_CONSTANT: return const_instr("OP_CONSTANT", chunk, offset);
-        case OP_RETURN:   return simple_instr("OP_RETURN", offset);
-        case OP_NEGATE:   return simple_instr("OP_NEGATE", offset);
-        case OP_ADD:      return simple_instr("OP_ADD", offset);
-        case OP_SUBTRACT: return simple_instr("OP_SUBTRACT", offset);
-        case OP_MULTIPLY: return simple_instr("OP_MULTIPLY", offset);
-        case OP_DIVIDE:   return simple_instr("OP_DIVIDE", offset);
+        case OP_CONSTANT: return _const_instr("OP_CONSTANT", chunk, offset);
+        case OP_RETURN:   return _simple_instr("OP_RETURN", offset);
+        case OP_NEGATE:   return _simple_instr("OP_NEGATE", offset);
+        case OP_ADD:      return _simple_instr("OP_ADD", offset);
+        case OP_SUBTRACT: return _simple_instr("OP_SUBTRACT", offset);
+        case OP_MULTIPLY: return _simple_instr("OP_MULTIPLY", offset);
+        case OP_DIVIDE:   return _simple_instr("OP_DIVIDE", offset);
         default:
             printf("Unknown opcode %d\n", instr);
             return offset + 1;

@@ -5,7 +5,7 @@
 // PRIVATE
 //
 
-static int32_t chunk_add_const(
+static int32_t _chunk_add_const(
     chunk_t *chunk,
     cvalue_t value
 ) {
@@ -13,7 +13,7 @@ static int32_t chunk_add_const(
     return chunk->consts.len - 1;
 }
 
-static void chunk_write(
+static void _chunk_write(
     chunk_t *chunk,
     uint8_t byte
 ) {
@@ -58,7 +58,7 @@ void chunk_write_instr(
     uint8_t opcode,
     int32_t line
 ) {
-    chunk_write(chunk, opcode);
+    _chunk_write(chunk, opcode);
     line_array_write(&chunk->lines, line);
 }
 
@@ -67,11 +67,11 @@ void chunk_write_const(
     cvalue_t value,
     int32_t line
 ) {
-    int32_t const_idx = chunk_add_const(chunk, value);
+    int32_t const_idx = _chunk_add_const(chunk, value);
 
-    chunk_write(chunk, OP_CONSTANT);
-    chunk_write(chunk, (const_idx >> 8) & 0xFF);
-    chunk_write(chunk, const_idx & 0xFF);
+    _chunk_write(chunk, OP_CONSTANT);
+    _chunk_write(chunk, (const_idx >> 8) & 0xFF);
+    _chunk_write(chunk, const_idx & 0xFF);
 
     line_array_write(&chunk->lines, line);
 }

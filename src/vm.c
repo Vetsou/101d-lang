@@ -11,28 +11,28 @@
 // PRIVATE
 //
 
-static inline void reset_stack(
+static inline void _reset_stack(
     vm_t *vm
 ) {
     vm->stack_top = vm->stack;
 }
 
-static inline void vm_stack_negate_top(
+static inline void _vm_stack_negate_top(
     vm_t *vm
 ) {
     vm->stack_top[-1] = -vm->stack_top[-1];
 }
 
-static inline uint8_t read_byte(
+static inline uint8_t _read_byte(
     vm_t *vm
 ) {
     return *vm->b_ptr++;
 }
 
-static inline cvalue_t read_const(
+static inline cvalue_t _read_const(
     vm_t *vm
 ) {
-    return vm->chunk->consts.values[((uint16_t)read_byte(vm) << 8) | read_byte(vm)];
+    return vm->chunk->consts.values[((uint16_t)_read_byte(vm) << 8) | _read_byte(vm)];
 }
 
 static dl_result_t run_code(
@@ -67,13 +67,13 @@ static dl_result_t run_code(
     disassemble_instr(vm->chunk, (size_t)(vm->b_ptr - vm->chunk->code), &line_iter);
 #endif
 
-        switch (instr = read_byte(vm)) {
+        switch (instr = _read_byte(vm)) {
             case OP_CONSTANT: {
-                cvalue_t constant = read_const(vm);
+                cvalue_t constant = _read_const(vm);
                 vm_stack_push(vm, constant);
                 break;
             }
-            case OP_NEGATE:   vm_stack_negate_top(vm); break;
+            case OP_NEGATE:   _vm_stack_negate_top(vm); break;
             case OP_ADD:      BINARY_OP(+); break;
             case OP_SUBTRACT: BINARY_OP(-); break;
             case OP_MULTIPLY: BINARY_OP(*); break;
@@ -95,7 +95,7 @@ static dl_result_t run_code(
 void vm_init(
     vm_t *vm
 ) {
-    reset_stack(vm);
+    _reset_stack(vm);
 }
 
 dl_result_t vm_interpret(
