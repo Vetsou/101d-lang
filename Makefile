@@ -72,7 +72,7 @@ endif
 build: setup $(TARGET)
 
 run: setup $(TARGET)
-	$(TARGET) example/test.101d
+	$(TARGET) example/parser_test.101d
 
 ##############################
 # RELEASE BUILD COMMANDS

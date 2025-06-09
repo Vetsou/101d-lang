@@ -1,4 +1,6 @@
 #include "vm.h"
+
+#include "compiler.h"
 #include <stdio.h>
 
 #ifdef DEBUG_TRACE_EXEC
@@ -33,7 +35,7 @@ static inline cvalue_t read_const(
     return vm->chunk->consts.values[((uint16_t)read_byte(vm) << 8) | read_byte(vm)];
 }
 
-static interpret_result_t run_code(
+static dl_result_t run_code(
     vm_t *vm
 ) {
 
@@ -78,7 +80,7 @@ static interpret_result_t run_code(
             case OP_DIVIDE:   BINARY_OP(/); break;
             case OP_RETURN: {
                 print_value(vm_stack_pop(vm));
-                return INTERPRET_OK;
+                return DL_OK;
             }
         }
     }
@@ -96,13 +98,26 @@ void vm_init(
     reset_stack(vm);
 }
 
-interpret_result_t vm_interpret(
+dl_result_t vm_interpret(
     vm_t *vm,
-    chunk_t *chunk
+    const char *source
 ) {
-    vm->chunk = chunk;
-    vm->b_ptr = chunk->code;
-    return run_code(vm);
+    chunk_t chunk;
+    chunk_init(&chunk);
+
+    if (!compile(source, &chunk)) {
+        chunk_free(&chunk);
+        return DL_COMPILER_ERR;
+    }
+
+    vm->chunk = &chunk;
+    vm->b_ptr = vm->chunk->code;
+
+    // TODO: Uncomment after initial parser implementation
+    //dl_result_t result = run_code(vm);
+    chunk_free(&chunk);
+
+    return DL_OK;
 }
 
 void vm_free(

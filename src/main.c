@@ -1,4 +1,4 @@
-#include "compiler.h"
+#include "vm.h"
 #include "debug.h"
 #include "err.h"
 
@@ -67,7 +67,10 @@ dl_result_t process_file(
     dl_result_t file_result = read_file(filepath, &src_buffer);
     if (file_result != DL_OK) return file_result;
 
-    compile(src_buffer);
+    vm_t vm;
+    vm_init(&vm);
+    vm_interpret(&vm, src_buffer);
+    vm_free(&vm);
 
     free(src_buffer);
     return DL_OK;
