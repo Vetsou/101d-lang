@@ -35,12 +35,12 @@ void test_partial_keywords() {
 void test_function() {
     token_type_t expected[] = {
         TOK_FUNCTION, TOK_IDENTIFIER, TOK_LEFT_PAREN, TOK_RIGHT_PAREN,
-        TOK_LEFT_BRACE, TOK_RETURN, TOK_NUMBER, TOK_RIGHT_BRACE,
+        TOK_LEFT_BRACE, TOK_RETURN, TOK_NUMBER, TOK_SEMICOLON, TOK_RIGHT_BRACE,
         TOK_EOF
     };
 
     lexer_t lexer;
-    lexer_init(&lexer, "FN my_func_name() [\nRET 0\n]");
+    lexer_init(&lexer, "FN my_func_name() [\nRET 0;\n]");
     check_tokens(&lexer, expected);
 }
 
@@ -50,23 +50,23 @@ void test_if() {
         TOK_IDENTIFIER, TOK_UNEQUAL, TOK_IDENTIFIER,
         TOK_RIGHT_PAREN,
         TOK_LEFT_BRACE,
-        TOK_PRINT, TOK_IDENTIFIER,
+        TOK_PRINT, TOK_IDENTIFIER, TOK_SEMICOLON,
         TOK_RIGHT_BRACE, TOK_EOF
     };
 
     lexer_t lexer;
-    lexer_init(&lexer, "IF (a <> b) [\nPRINT a\n]");
+    lexer_init(&lexer, "IF (a <> b) [\nPRINT a;\n]");
     check_tokens(&lexer, expected);
 }
 
 void test_variable() {
     token_type_t expected[] = {
         TOK_VAR, TOK_IDENTIFIER,
-        TOK_EQUAL, TOK_NUMBER, TOK_EOF
+        TOK_EQUAL, TOK_NUMBER, TOK_SEMICOLON, TOK_EOF
     };
 
     lexer_t lexer;
-    lexer_init(&lexer, "VAR a = 4");
+    lexer_init(&lexer, "VAR a = 4;");
     check_tokens(&lexer, expected);
 }
 
@@ -131,6 +131,21 @@ void test_multiple_block_comments() {
     check_tokens(&lexer, expected);
 }
 
+void test_while() {
+    token_type_t expected[] = {
+        TOK_WHILE, TOK_LEFT_PAREN,
+        TOK_IDENTIFIER, TOK_UNEQUAL, TOK_NUMBER,
+        TOK_RIGHT_PAREN, TOK_LEFT_BRACE,
+        TOK_IDENTIFIER, TOK_EQUAL, TOK_IDENTIFIER,
+        TOK_PLUS, TOK_NUMBER, TOK_SEMICOLON,
+        TOK_RIGHT_BRACE, TOK_EOF
+    };
+
+    lexer_t lexer;
+    lexer_init(&lexer, "WHILE (a <> 0) [\n a = a + 1;\n]");
+    check_tokens(&lexer, expected);
+}
+
 int main(void) {
     printf("#################### [LEXER TESTS] ####################\n");
     UNITY_BEGIN();
@@ -144,6 +159,7 @@ int main(void) {
     RUN_TEST(test_comment);
     RUN_TEST(test_block_comment);
     RUN_TEST(test_multiple_block_comments);
+    RUN_TEST(test_while);
 
     return UNITY_END();
 }

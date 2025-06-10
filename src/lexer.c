@@ -185,6 +185,7 @@ static token_type_t _get_identifier_type(
         case 'V': return _handle_keyword(lexer, 1, 2, "AR", TOK_VAR);
         case 'P': return _handle_keyword(lexer, 1, 4, "RINT", TOK_PRINT);
         case 'I': return _handle_keyword(lexer, 1, 1, "F", TOK_IF);
+        case 'W': return _handle_keyword(lexer, 1, 4, "HILE", TOK_WHILE);
         case 'F':
             if (lexer->curr - lexer->start > 1) {
                 switch (lexer->start[1]) {
@@ -252,6 +253,7 @@ token_t lexer_scan(
         case '!': return _token_create(TOK_BANG, lexer);
         case ',': return _token_create(TOK_COMMA, lexer);
         case '.': return _token_create(TOK_DOT, lexer);
+        case ';': return _token_create(TOK_SEMICOLON, lexer);
         case '|':
             if (_match_and_move(lexer, '|')) return _token_create(TOK_OR, lexer);
             break;

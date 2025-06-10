@@ -20,9 +20,9 @@ typedef struct {
 typedef enum {
     PREC_NONE = 0,
     PREC_ASSIGNMENT, // =
-    PREC_OR,         // or
-    PREC_AND,        // and
-    PREC_EQUALITY,   // == !=
+    PREC_OR,         // OR
+    PREC_AND,        // AND
+    PREC_EQUALITY,   // == <>
     PREC_COMPARISON, // < > <= >=
     PREC_TERM,       // + -
     PREC_FACTOR,     // * /
@@ -105,6 +105,7 @@ static void _error_at(
     token_t *tok,
     const char *msg
 ) {
+    if (parser->panic_mode) return;
     parser->panic_mode = true;
     parser->had_err = true;
     fprintf(stderr, "[line %d] Error", tok->line);

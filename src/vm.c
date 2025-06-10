@@ -113,10 +113,13 @@ dl_result_t vm_interpret(
     vm->chunk = &chunk;
     vm->b_ptr = vm->chunk->code;
 
-    // TODO: Uncomment after initial parser implementation
-    //dl_result_t result = run_code(vm);
-    chunk_free(&chunk);
+    dl_result_t result = run_code(vm);
+    if (result != DL_OK) {
+        chunk_free(&chunk);
+        return result;
+    }
 
+    chunk_free(&chunk);
     return DL_OK;
 }
 
