@@ -62,18 +62,22 @@ void chunk_write_instr(
     line_array_write(&chunk->lines, line);
 }
 
-void chunk_write_const(
+int32_t chunk_write_const(
     chunk_t *chunk,
     cvalue_t value,
     int32_t line
 ) {
     int32_t const_idx = _chunk_add_const(chunk, value);
 
+    if (const_idx > UINT16_MAX) return -1;
+
     _chunk_write(chunk, OP_CONSTANT);
     _chunk_write(chunk, (const_idx >> 8) & 0xFF);
     _chunk_write(chunk, const_idx & 0xFF);
 
     line_array_write(&chunk->lines, line);
+
+    return const_idx;
 }
 
 int32_t chunk_get_line(

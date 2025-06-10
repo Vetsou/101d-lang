@@ -22,7 +22,7 @@ typedef struct {
 void chunk_init(chunk_t *chunk);
 void chunk_free(chunk_t *chunk);
 void chunk_write_instr(chunk_t *chunk, uint8_t byte, int32_t line);
-void chunk_write_const(chunk_t *chunk, cvalue_t value, int32_t line);
+int32_t chunk_write_const(chunk_t *chunk, cvalue_t value, int32_t line);
 int32_t chunk_get_line(chunk_t *chunk, size_t instr_index);
 
 #endif // _CHUNK_H_
