@@ -3,7 +3,7 @@
 
 # Syntax concept
 
-```js
+```
 # Single-line comment
 
 FN add(a, b) [

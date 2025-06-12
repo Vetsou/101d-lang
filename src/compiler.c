@@ -4,6 +4,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#ifdef DEBUG_TRACE_EXEC
+#include "debug.h"
+#endif // DEBUG_TRACE_EXEC
+
 //
 // Types
 //
@@ -299,6 +303,12 @@ bool compile(
     _expression(&parser);
     _consume_token(&parser, TOK_EOF, "Expect end.");
     _emit_return(&parser);
+
+#ifdef DEBUG_TRACE_EXEC
+    if (!parser.had_err) {
+        disassemble_chunk(chunk, "Output code");
+    }
+#endif // DEBUG_TRACE_EXEC
 
     return !parser.had_err;
 }
