@@ -16,7 +16,7 @@ typedef enum {
 
     // Keywords
     TOK_IF, TOK_ELSE, TOK_WHILE,
-    TOK_PRINT, TOK_NULL,
+    TOK_PRINT, TOK_NIL,
     TOK_VAR, TOK_FUNCTION, TOK_RETURN,
 
     // Literals

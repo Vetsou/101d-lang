@@ -167,7 +167,7 @@ static void _emit_return(
 
 static uint16_t _emit_const(
     parser_t *parser,
-    cvalue_t value
+    value_t value
 ) {
     int32_t const_idx = chunk_write_const(parser->chunk, value, parser->prev.line);
     if (const_idx == -1) {
@@ -236,7 +236,7 @@ static void _number(
     parser_t *parser
 ) {
     double value = strtod(parser->prev.start, NULL);
-    _emit_const(parser, value);
+    _emit_const(parser, NUMBER_VAL(value));
 }
 
 static void _expression(

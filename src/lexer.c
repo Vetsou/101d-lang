@@ -195,7 +195,7 @@ static token_type_t _get_identifier_type(
             }
             break;
         case 'R': return _handle_keyword(lexer, 1, 2, "ET", TOK_RETURN);
-        case 'N': return _handle_keyword(lexer, 1, 2, "IL", TOK_NULL);
+        case 'N': return _handle_keyword(lexer, 1, 2, "IL", TOK_NIL);
         case 'E': return _handle_keyword(lexer, 1, 3, "LSE", TOK_ELSE);
         case 'T': return _handle_keyword(lexer, 1, 3, "RUE", TOK_TRUE);
     }

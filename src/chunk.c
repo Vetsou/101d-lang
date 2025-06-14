@@ -7,7 +7,7 @@
 
 static int32_t _chunk_add_const(
     chunk_t *chunk,
-    cvalue_t value
+    value_t value
 ) {
     value_array_write(&chunk->consts, value);
     return chunk->consts.len - 1;
@@ -64,7 +64,7 @@ void chunk_write_instr(
 
 int32_t chunk_write_const(
     chunk_t *chunk,
-    cvalue_t value,
+    value_t value,
     int32_t line
 ) {
     int32_t const_idx = _chunk_add_const(chunk, value);

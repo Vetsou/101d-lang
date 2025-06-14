@@ -1,6 +1,7 @@
 #include "vm.h"
 
 #include "compiler.h"
+#include <stdarg.h>
 #include <stdio.h>
 
 #ifdef DEBUG_TRACE_EXEC
@@ -17,10 +18,42 @@ static inline void _reset_stack(
     vm->stack_top = vm->stack;
 }
 
-static inline void _vm_stack_negate_top(
+static inline value_t _stack_peek(
+    vm_t *vm,
+    uint8_t distance
+) {
+    return vm->stack_top[-1 - distance];
+}
+
+// RUNTIME ERROR
+
+static void _runtime_err(
+    vm_t *vm,
+    const char *format,
+    ...
+) {
+    va_list args;
+    va_start(args, format);
+    vfprintf(stderr, format, args);
+    va_end(args);
+    fputs("\n", stderr);
+
+    size_t instr_idx = vm->b_ptr - vm->chunk->code - 1;
+    int32_t line = chunk_get_line(vm->chunk, instr_idx);
+    fprintf(stderr, "[Line %d] in script\n", line);
+    _reset_stack(vm);
+}
+
+static inline bool _vm_stack_negate_top(
     vm_t *vm
 ) {
-    vm->stack_top[-1] = -vm->stack_top[-1];
+    if (!IS_NUMBER(_stack_peek(vm, 0))) {
+        _runtime_err(vm, "Operand must be a number.");
+        return false;
+    }
+
+    vm->stack_top[-1] = NUMBER_VAL(-AS_NUMBER(vm->stack_top[-1]));
+    return true;
 }
 
 static inline uint8_t _read_byte(
@@ -29,7 +62,7 @@ static inline uint8_t _read_byte(
     return *vm->b_ptr++;
 }
 
-static inline cvalue_t _read_const(
+static inline value_t _read_const(
     vm_t *vm
 ) {
     return vm->chunk->consts.values[((uint16_t)_read_byte(vm) << 8) | _read_byte(vm)];
@@ -39,11 +72,15 @@ static dl_result_t run_code(
     vm_t *vm
 ) {
 
-#define BINARY_OP(op)                \
-    do {                             \
-        double b = vm_stack_pop(vm); \
-        double a = vm_stack_pop(vm); \
-        vm_stack_push(vm, a op b);   \
+#define BINARY_OP(val_type, op)                                                   \
+    do {                                                                          \
+        if ( !IS_NUMBER(_stack_peek(vm, 0)) || !IS_NUMBER(_stack_peek(vm, 1)) ) { \
+            _runtime_err(vm, "Operands must be numbers.");                        \
+            return DL_RUNTIME_ERR;                                                \
+        }                                                                         \
+        double b = AS_NUMBER(vm_stack_pop(vm));                                   \
+        double a = AS_NUMBER(vm_stack_pop(vm));                                   \
+        vm_stack_push(vm, val_type(a op b));                                      \
     } while (false)
 
 
@@ -58,7 +95,7 @@ static dl_result_t run_code(
 
 #ifdef DEBUG_TRACE_EXEC
     printf("          ");
-    for (cvalue_t *slot = vm->stack; slot < vm->stack_top; slot++) {
+    for (value_t *slot = vm->stack; slot < vm->stack_top; slot++) {
         printf("[ ");
         print_value(*slot);
         printf(" ]");
@@ -69,15 +106,17 @@ static dl_result_t run_code(
 
         switch (instr = _read_byte(vm)) {
             case OP_CONSTANT: {
-                cvalue_t constant = _read_const(vm);
+                value_t constant = _read_const(vm);
                 vm_stack_push(vm, constant);
                 break;
             }
-            case OP_NEGATE:   _vm_stack_negate_top(vm); break;
-            case OP_ADD:      BINARY_OP(+); break;
-            case OP_SUBTRACT: BINARY_OP(-); break;
-            case OP_MULTIPLY: BINARY_OP(*); break;
-            case OP_DIVIDE:   BINARY_OP(/); break;
+            case OP_NEGATE:
+                if (!_vm_stack_negate_top(vm)) return DL_RUNTIME_ERR;
+                break;
+            case OP_ADD:      BINARY_OP(NUMBER_VAL, +); break;
+            case OP_SUBTRACT: BINARY_OP(NUMBER_VAL, -); break;
+            case OP_MULTIPLY: BINARY_OP(NUMBER_VAL, *); break;
+            case OP_DIVIDE:   BINARY_OP(NUMBER_VAL, /); break;
             case OP_RETURN: {
                 print_value(vm_stack_pop(vm));
                 return DL_OK;
@@ -131,13 +170,13 @@ void vm_free(
 
 inline void vm_stack_push(
     vm_t *vm,
-    cvalue_t value
+    value_t value
 ) {
     *vm->stack_top = value;
     vm->stack_top++;
 }
 
-inline cvalue_t vm_stack_pop(
+inline value_t vm_stack_pop(
     vm_t *vm
 ) {
     vm->stack_top--;
