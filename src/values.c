@@ -7,6 +7,19 @@
 // PUBLIC
 //
 
+bool values_equal(
+    value_t a,
+    value_t b
+) {
+    if (a.type != b.type) return false;
+    switch (a.type) {
+        case VAL_BOOL:   return AS_BOOL(a) == AS_BOOL(b);
+        case VAL_NIL:    return true;
+        case VAL_NUMBER: return AS_NUMBER(a) == AS_NUMBER(b);
+        default: return false; // Unreachable
+    }
+}
+
 void value_array_init(
     value_array_t *array
 ) {
@@ -40,5 +53,11 @@ void value_array_free(
 }
 
 void print_value(value_t value) {
-    printf("%g", AS_NUMBER(value));
+    switch (value.type) {
+        case VAL_BOOL:
+            printf(AS_BOOL(value) ? "true" : "false");
+            break;
+        case VAL_NIL: printf("nil"); break;
+        case VAL_NUMBER: printf("%g", AS_NUMBER(value)); break;
+    }
 }

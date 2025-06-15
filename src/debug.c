@@ -107,6 +107,13 @@ int32_t disassemble_instr(
         case OP_SUBTRACT: return _simple_instr("OP_SUBTRACT", offset);
         case OP_MULTIPLY: return _simple_instr("OP_MULTIPLY", offset);
         case OP_DIVIDE:   return _simple_instr("OP_DIVIDE", offset);
+        case OP_NIL:      return _simple_instr("OP_NIL", offset);
+        case OP_TRUE:     return _simple_instr("OP_TRUE", offset);
+        case OP_FALSE:    return _simple_instr("OP_FALSE", offset);
+        case OP_NOT:      return _simple_instr("OP_NOT", offset);
+        case OP_EQUAL:    return _simple_instr("OP_EQUAL", offset);
+        case OP_GREATER:  return _simple_instr("OP_GREATER", offset);
+        case OP_LESS:     return _simple_instr("OP_LESS", offset);
         default:
             printf("Unknown opcode %d\n", instr);
             return offset + 1;

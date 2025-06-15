@@ -56,6 +56,10 @@ static inline bool _vm_stack_negate_top(
     return true;
 }
 
+static bool is_falsey(value_t value) {
+    return IS_NIL(value) || (IS_BOOL(value) && !AS_BOOL(value));
+}
+
 static inline uint8_t _read_byte(
     vm_t *vm
 ) {
@@ -105,11 +109,15 @@ static dl_result_t run_code(
 #endif
 
         switch (instr = _read_byte(vm)) {
+            case OP_NIL:   vm_stack_push(vm, NIL_VAL); break;
+            case OP_TRUE:  vm_stack_push(vm, BOOL_VAL(true)); break;
+            case OP_FALSE: vm_stack_push(vm, BOOL_VAL(false)); break;
             case OP_CONSTANT: {
                 value_t constant = _read_const(vm);
                 vm_stack_push(vm, constant);
                 break;
             }
+
             case OP_NEGATE:
                 if (!_vm_stack_negate_top(vm)) return DL_RUNTIME_ERR;
                 break;
@@ -117,6 +125,19 @@ static dl_result_t run_code(
             case OP_SUBTRACT: BINARY_OP(NUMBER_VAL, -); break;
             case OP_MULTIPLY: BINARY_OP(NUMBER_VAL, *); break;
             case OP_DIVIDE:   BINARY_OP(NUMBER_VAL, /); break;
+
+            case OP_GREATER:  BINARY_OP(BOOL_VAL, >); break;
+            case OP_LESS:     BINARY_OP(BOOL_VAL, <); break;
+            case OP_NOT:
+                vm_stack_push( vm, BOOL_VAL(is_falsey(vm_stack_pop(vm))) );
+                break;
+            case OP_EQUAL: {
+                value_t a = vm_stack_pop(vm);
+                value_t b = vm_stack_pop(vm);
+                vm_stack_push(vm, BOOL_VAL(values_equal(a, b)));
+                break;
+            }
+
             case OP_RETURN: {
                 print_value(vm_stack_pop(vm));
                 return DL_OK;

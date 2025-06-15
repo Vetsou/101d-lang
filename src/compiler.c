@@ -49,6 +49,7 @@ static void _expression(parser_t *parser);
 static void _grouping(parser_t *parser);
 static void _binary(parser_t *parser);
 static void _number(parser_t *parser);
+static void _literal(parser_t *parser);
 // ==============================
 
 parse_rule_t rules[] = {
@@ -63,33 +64,33 @@ parse_rule_t rules[] = {
     //[TOK_SEMICOLON]   = {NULL,        NULL,   PREC_NONE},
     [TOK_SLASH]         = {NULL,     _binary,   PREC_FACTOR},
     [TOK_STAR]          = {NULL,     _binary,   PREC_FACTOR},
-    [TOK_BANG]          = {NULL,        NULL,   PREC_NONE},
-    [TOK_UNEQUAL]       = {NULL,        NULL,   PREC_NONE},
+    [TOK_BANG]          = {_unary,      NULL,   PREC_NONE},
+    [TOK_UNEQUAL]       = {NULL,     _binary,   PREC_EQUALITY},
     [TOK_EQUAL]         = {NULL,        NULL,   PREC_NONE},
-    [TOK_EQUAL_EQUAL]   = {NULL,        NULL,   PREC_NONE},
-    [TOK_GREATER]       = {NULL,        NULL,   PREC_NONE},
-    [TOK_GREATER_EQUAL] = {NULL,        NULL,   PREC_NONE},
-    [TOK_LESS]          = {NULL,        NULL,   PREC_NONE},
-    [TOK_LESS_EQUAL]    = {NULL,        NULL,   PREC_NONE},
+    [TOK_EQUAL_EQUAL]   = {NULL,     _binary,   PREC_EQUALITY},
+    [TOK_GREATER]       = {NULL,     _binary,   PREC_COMPARISON},
+    [TOK_GREATER_EQUAL] = {NULL,     _binary,   PREC_COMPARISON},
+    [TOK_LESS]          = {NULL,     _binary,   PREC_COMPARISON},
+    [TOK_LESS_EQUAL]    = {NULL,     _binary,   PREC_COMPARISON},
     [TOK_IDENTIFIER]    = {NULL,        NULL,   PREC_NONE},
     [TOK_STRING]        = {NULL,        NULL,   PREC_NONE},
     [TOK_NUMBER]        = {_number,     NULL,   PREC_NONE},
     [TOK_AND]           = {NULL,        NULL,   PREC_NONE},
     //[TOK_CLASS]       = {NULL,        NULL,   PREC_NONE},
     [TOK_ELSE]          = {NULL,        NULL,   PREC_NONE},
-    [TOK_FALSE]         = {NULL,        NULL,   PREC_NONE},
+    [TOK_FALSE]         = {_literal,    NULL,   PREC_NONE},
     //[TOK_FOR]         = {NULL,        NULL,   PREC_NONE},
     //[TOK_FUN]         = {NULL,        NULL,   PREC_NONE},
     [TOK_IF]            = {NULL,        NULL,   PREC_NONE},
-    //[TOK_NULL]         = {NULL,       NULL,   PREC_NONE},
+    [TOK_NIL]           = {_literal,    NULL,   PREC_NONE},
     [TOK_OR]            = {NULL,        NULL,   PREC_NONE},
     [TOK_PRINT]         = {NULL,        NULL,   PREC_NONE},
     [TOK_RETURN]        = {NULL,        NULL,   PREC_NONE},
     //[TOK_SUPER]       = {NULL,        NULL,   PREC_NONE},
     //[TOK_THIS]        = {NULL,        NULL,   PREC_NONE},
-    [TOK_TRUE]          = {NULL,        NULL,   PREC_NONE},
+    [TOK_TRUE]          = {_literal,    NULL,   PREC_NONE},
     [TOK_VAR]           = {NULL,        NULL,   PREC_NONE},
-    //[TOK_WHILE]       = {NULL,        NULL,   PREC_NONE},
+    [TOK_WHILE]         = {NULL,        NULL,   PREC_NONE},
     [TOK_ERROR]         = {NULL,        NULL,   PREC_NONE},
     [TOK_EOF]           = {NULL,        NULL,   PREC_NONE},
 };
@@ -261,7 +262,19 @@ static void _unary(
 
     switch (oper_type) {
         case TOK_MINUS: _emit_byte(parser, OP_NEGATE); break;
-        default: return;
+        case TOK_BANG:  _emit_byte(parser, OP_NOT); break;
+        default: return; // Unreachable
+    }
+}
+
+static void _literal(
+    parser_t *parser
+) {
+    switch (parser->prev.type) {
+        case TOK_FALSE: _emit_byte(parser, OP_FALSE); break;
+        case TOK_TRUE:  _emit_byte(parser, OP_TRUE); break;
+        case TOK_NIL:   _emit_byte(parser, OP_NIL); break;
+        default: return; // Unreachable
     }
 }
 
@@ -277,6 +290,13 @@ static void _binary(
         case TOK_MINUS: _emit_byte(parser, OP_SUBTRACT); break;
         case TOK_STAR:  _emit_byte(parser, OP_MULTIPLY); break;
         case TOK_SLASH: _emit_byte(parser, OP_DIVIDE);   break;
+
+        case TOK_UNEQUAL:       _emit_bytes(parser, OP_EQUAL, OP_NOT);   break;
+        case TOK_EQUAL_EQUAL:   _emit_byte(parser, OP_EQUAL);            break;
+        case TOK_GREATER:       _emit_byte(parser, OP_GREATER);          break;
+        case TOK_GREATER_EQUAL: _emit_bytes(parser, OP_LESS, OP_NOT);    break;
+        case TOK_LESS:          _emit_byte(parser, OP_LESS);             break;
+        case TOK_LESS_EQUAL:    _emit_bytes(parser, OP_GREATER, OP_NOT); break;
         default: return; // Unreachable.
     }
 }
