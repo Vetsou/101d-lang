@@ -11,9 +11,9 @@ void tearDown(void) { chunk_free(&chunk); }
 ********************/
 
 void chunk_test_lines() {
-    chunk_write_const(&chunk, 123, 3);
-    chunk_write_const(&chunk, 442, 3);
-    chunk_write_const(&chunk, 333, 4);
+    chunk_write_const(&chunk, NUMBER_VAL(123), 3);
+    chunk_write_const(&chunk, NUMBER_VAL(442), 3);
+    chunk_write_const(&chunk, NUMBER_VAL(333), 4);
     chunk_write_instr(&chunk, OP_RETURN, 5);
     chunk_write_instr(&chunk, OP_RETURN, 5);
     chunk_write_instr(&chunk, OP_RETURN, 6);
@@ -33,8 +33,8 @@ void chunk_test_lines() {
 }
 
 void chunk_test_get_line() {
-    chunk_write_const(&chunk, 123, 3);
-    chunk_write_const(&chunk, 2233, 4);
+    chunk_write_const(&chunk, NUMBER_VAL(123), 3);
+    chunk_write_const(&chunk, NUMBER_VAL(2233), 4);
     chunk_write_instr(&chunk, OP_RETURN, 5);
     chunk_write_instr(&chunk, OP_RETURN, 5);
     chunk_write_instr(&chunk, OP_RETURN, 6);
@@ -43,15 +43,15 @@ void chunk_test_get_line() {
 }
 
 void chunk_test_const() {
-    chunk_write_const(&chunk, 1.55, 3);
-    chunk_write_const(&chunk, 1024, 5);
+    chunk_write_const(&chunk, NUMBER_VAL(1.55), 3);
+    chunk_write_const(&chunk, NUMBER_VAL(1024), 5);
 
     TEST_ASSERT_EQUAL_INT(6, chunk.len); // 3 bytes per OP_CONST
     TEST_ASSERT_EQUAL_INT(2, chunk.lines.len);
 
     TEST_ASSERT_EQUAL_INT(2, chunk.consts.len);
-    TEST_ASSERT_EQUAL_INT(1.55, chunk.consts.values[0]);
-    TEST_ASSERT_EQUAL_INT(1024, chunk.consts.values[1]);
+    TEST_ASSERT_EQUAL_INT(1.55, AS_NUMBER(chunk.consts.values[0]));
+    TEST_ASSERT_EQUAL_INT(1024, AS_NUMBER(chunk.consts.values[1]));
 }
 
 int main(void) {
