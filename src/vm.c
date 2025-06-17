@@ -126,8 +126,10 @@ static dl_result_t run_code(
             case OP_MULTIPLY: BINARY_OP(NUMBER_VAL, *); break;
             case OP_DIVIDE:   BINARY_OP(NUMBER_VAL, /); break;
 
-            case OP_GREATER:  BINARY_OP(BOOL_VAL, >); break;
-            case OP_LESS:     BINARY_OP(BOOL_VAL, <); break;
+            case OP_GREATER:       BINARY_OP(BOOL_VAL, >);  break;
+            case OP_LESS:          BINARY_OP(BOOL_VAL, <);  break;
+            case OP_GREATER_EQUAL: BINARY_OP(BOOL_VAL, >=); break;
+            case OP_LESS_EQUAL:    BINARY_OP(BOOL_VAL, <=); break;
             case OP_NOT:
                 vm_stack_push( vm, BOOL_VAL(is_falsey(vm_stack_pop(vm))) );
                 break;
@@ -135,6 +137,12 @@ static dl_result_t run_code(
                 value_t a = vm_stack_pop(vm);
                 value_t b = vm_stack_pop(vm);
                 vm_stack_push(vm, BOOL_VAL(values_equal(a, b)));
+                break;
+            }
+            case OP_UNEQUAL: {
+                value_t a = vm_stack_pop(vm);
+                value_t b = vm_stack_pop(vm);
+                vm_stack_push(vm, BOOL_VAL(!values_equal(a, b)));
                 break;
             }
 

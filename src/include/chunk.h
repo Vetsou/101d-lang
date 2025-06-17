@@ -8,14 +8,19 @@
 typedef enum {
     OP_RETURN,
 
+    // Constants and literals
     OP_CONSTANT,
     OP_NIL, OP_TRUE, OP_FALSE,
 
+    // Arithmetic operations
     OP_NEGATE,
     OP_ADD, OP_SUBTRACT, OP_MULTIPLY, OP_DIVIDE,
 
+    // Bool operations
     OP_NOT,
-    OP_EQUAL, OP_GREATER, OP_LESS,
+    OP_EQUAL, OP_UNEQUAL,
+    OP_GREATER, OP_GREATER_EQUAL,
+    OP_LESS, OP_LESS_EQUAL
 } op_code_t;
 
 typedef struct {

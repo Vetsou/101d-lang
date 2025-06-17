@@ -291,12 +291,12 @@ static void _binary(
         case TOK_STAR:  _emit_byte(parser, OP_MULTIPLY); break;
         case TOK_SLASH: _emit_byte(parser, OP_DIVIDE);   break;
 
-        case TOK_UNEQUAL:       _emit_bytes(parser, OP_EQUAL, OP_NOT);   break;
+        case TOK_UNEQUAL:       _emit_byte(parser, OP_UNEQUAL);          break;
         case TOK_EQUAL_EQUAL:   _emit_byte(parser, OP_EQUAL);            break;
         case TOK_GREATER:       _emit_byte(parser, OP_GREATER);          break;
-        case TOK_GREATER_EQUAL: _emit_bytes(parser, OP_LESS, OP_NOT);    break;
+        case TOK_GREATER_EQUAL: _emit_byte(parser, OP_GREATER_EQUAL);    break;
         case TOK_LESS:          _emit_byte(parser, OP_LESS);             break;
-        case TOK_LESS_EQUAL:    _emit_bytes(parser, OP_GREATER, OP_NOT); break;
+        case TOK_LESS_EQUAL:    _emit_byte(parser, OP_LESS_EQUAL);      break;
         default: return; // Unreachable.
     }
 }
