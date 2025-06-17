@@ -3,7 +3,7 @@
 #include "unity.h"
 
 chunk_t chunk;
-void setUp(void) { chunk_init(&chunk); }
+void setUp(void)    { chunk_init(&chunk); }
 void tearDown(void) { chunk_free(&chunk); }
 
 /********************

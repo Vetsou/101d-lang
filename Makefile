@@ -8,6 +8,10 @@
 # release - Builds with all optimizations
 BUILD_MODE ?= dev
 
+# FILE PATH
+# Use this to determine the input file for the compiler
+FILE_PATH ?= example/parser_test.101d
+
 ##############################
 
 # Paths
@@ -72,7 +76,7 @@ endif
 build: setup $(TARGET)
 
 run: setup $(TARGET)
-	$(TARGET) example/parser_test.101d
+	$(TARGET) $(FILE_PATH)
 
 ##############################
 # RELEASE BUILD COMMANDS
@@ -140,7 +144,7 @@ else
 endif
 
 # Testing module names
-TEST_MODULES = lexer chunk
+TEST_MODULES = lexer chunk compiler
 
 # TEST TEMPLATE ############################################
 define TEST_TEMPLATE
