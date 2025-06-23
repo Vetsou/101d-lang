@@ -3,6 +3,10 @@
 
 #include "types.h"
 
+//
+// ARRAY
+//
+
 #define MIN_ALLOC_SIZE 16
 
 #define CAPACITY_GROW(capacity) \
@@ -14,6 +18,13 @@
 
 #define ARRAY_FREE(type, pointer, old_count) \
     mem_realloc(pointer, sizeof(type) * (old_count), 0)
+
+//
+// ALLOCATION
+//
+
+#define ALLOC(type, count) \
+    (type*)mem_realloc(NULL, 0, sizeof(type) * (count))
 
 void* mem_realloc(void *pointer, size_t old_size, size_t new_size);
 

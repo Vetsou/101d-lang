@@ -1,7 +1,9 @@
 #include "values.h"
 #include "mem.h"
+#include "object.h"
 
 #include <stdio.h>
+#include <string.h>
 
 //
 // PUBLIC
@@ -16,6 +18,12 @@ bool values_equal(
         case VAL_BOOL:   return AS_BOOL(a) == AS_BOOL(b);
         case VAL_NIL:    return true;
         case VAL_NUMBER: return AS_NUMBER(a) == AS_NUMBER(b);
+        case VAL_OBJ: {
+            obj_str_t *str_a = AS_STRING(a);
+            obj_str_t *str_b = AS_STRING(b);
+            return str_a->len == str_b->len &&
+                memcmp(str_a->chars, str_b->chars, str_a->len) == 0;
+        }
         default: return false; // Unreachable
     }
 }
@@ -48,8 +56,8 @@ void value_array_write(
 void value_array_free(
     value_array_t *array
 ) {
-  ARRAY_FREE(value_t, array->values, array->capacity);
-  value_array_init(array);
+    ARRAY_FREE(value_t, array->values, array->capacity);
+    value_array_init(array);
 }
 
 void print_value(value_t value) {
@@ -59,5 +67,6 @@ void print_value(value_t value) {
             break;
         case VAL_NIL: printf("nil"); break;
         case VAL_NUMBER: printf("%g", AS_NUMBER(value)); break;
+        case VAL_OBJ: print_obj(value); break;
     }
 }

@@ -1,6 +1,7 @@
 #include "compiler.h"
 
 #include "types.h"
+#include "object.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -50,6 +51,7 @@ static void _grouping(parser_t *parser);
 static void _binary(parser_t *parser);
 static void _number(parser_t *parser);
 static void _literal(parser_t *parser);
+static void _string(parser_t *parser);
 // ==============================
 
 parse_rule_t rules[] = {
@@ -73,7 +75,7 @@ parse_rule_t rules[] = {
     [TOK_LESS]          = {NULL,     _binary,   PREC_COMPARISON},
     [TOK_LESS_EQUAL]    = {NULL,     _binary,   PREC_COMPARISON},
     [TOK_IDENTIFIER]    = {NULL,        NULL,   PREC_NONE},
-    [TOK_STRING]        = {NULL,        NULL,   PREC_NONE},
+    [TOK_STRING]        = {_string,     NULL,   PREC_NONE},
     [TOK_NUMBER]        = {_number,     NULL,   PREC_NONE},
     [TOK_AND]           = {NULL,        NULL,   PREC_NONE},
     //[TOK_CLASS]       = {NULL,        NULL,   PREC_NONE},
@@ -238,6 +240,14 @@ static void _number(
 ) {
     double value = strtod(parser->prev.start, NULL);
     _emit_const(parser, NUMBER_VAL(value));
+}
+
+static void _string(
+    parser_t *parser
+) {
+    _emit_const(parser, OBJ_VAL(
+        copy_str(parser->prev.start + 1, parser->prev.length - 2)
+    ));
 }
 
 static void _expression(

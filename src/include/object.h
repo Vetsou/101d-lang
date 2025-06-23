@@ -12,6 +12,8 @@ struct obj_t {
     obj_type_t type;
 };
 
+void print_obj(value_t value);
+
 #define OBJ_TYPE(value) (AS_OBJ(value)->type)
 
 //
@@ -23,6 +25,9 @@ struct obj_str_t {
     int32_t len;
     char *chars;
 };
+
+obj_str_t* copy_str(const char *chars, int32_t len);
+obj_str_t* take_str(char *chars, int32_t len);
 
 static inline bool is_obj_type(value_t value, obj_type_t type) {
     return IS_OBJ(value) && AS_OBJ(value)->type == type;

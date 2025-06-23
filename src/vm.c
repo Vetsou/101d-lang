@@ -1,8 +1,11 @@
 #include "vm.h"
-
 #include "compiler.h"
+#include "object.h"
+#include "mem.h"
+
 #include <stdarg.h>
 #include <stdio.h>
+#include <string.h>
 
 #ifdef DEBUG_TRACE_EXEC
 #include "debug.h"
@@ -56,7 +59,25 @@ static inline bool _vm_stack_negate_top(
     return true;
 }
 
-static bool is_falsey(value_t value) {
+static void _concatenate_str(
+    vm_t *vm
+) {
+    obj_str_t *b = AS_STRING(vm_stack_pop(vm));
+    obj_str_t *a = AS_STRING(vm_stack_pop(vm));
+
+    int length = a->len + b->len;
+    char* chars = ALLOC(char, length + 1);
+    memcpy(chars, a->chars, a->len);
+    memcpy(chars + a->len, b->chars, b->len);
+    chars[length] = '\0';
+
+    obj_str_t *result = take_str(chars, length);
+    vm_stack_push(vm, OBJ_VAL(result));
+}
+
+static bool is_falsey(
+    value_t value
+) {
     return IS_NIL(value) || (IS_BOOL(value) && !AS_BOOL(value));
 }
 
@@ -121,7 +142,19 @@ static dl_result_t run_code(
             case OP_NEGATE:
                 if (!_vm_stack_negate_top(vm)) return DL_RUNTIME_ERR;
                 break;
-            case OP_ADD:      BINARY_OP(NUMBER_VAL, +); break;
+            case OP_ADD: {
+                if (IS_STRING(_stack_peek(vm, 0)) && IS_STRING(_stack_peek(vm, 1))) {
+                    _concatenate_str(vm);
+                } else if (IS_NUMBER(_stack_peek(vm, 0)) && IS_NUMBER(_stack_peek(vm, 1))) {
+                    double b = AS_NUMBER(vm_stack_pop(vm));
+                    double a = AS_NUMBER(vm_stack_pop(vm));
+                    vm_stack_push(vm, NUMBER_VAL(a + b));
+                } else {
+                    _runtime_err(vm, "Operands must be two numbers or two strings.");
+                    return DL_RUNTIME_ERR;
+                }
+                break;
+            }
             case OP_SUBTRACT: BINARY_OP(NUMBER_VAL, -); break;
             case OP_MULTIPLY: BINARY_OP(NUMBER_VAL, *); break;
             case OP_DIVIDE:   BINARY_OP(NUMBER_VAL, /); break;
