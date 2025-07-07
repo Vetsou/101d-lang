@@ -1,6 +1,5 @@
 #include "vm.h"
 #include "compiler.h"
-#include "object.h"
 #include "mem.h"
 
 #include <stdarg.h>
@@ -71,7 +70,7 @@ static void _concatenate_str(
     memcpy(chars + a->len, b->chars, b->len);
     chars[length] = '\0';
 
-    obj_str_t *result = take_str(chars, length);
+    obj_str_t *result = take_str(vm->gc, chars, length);
     vm_stack_push(vm, OBJ_VAL(result));
 }
 
@@ -190,7 +189,26 @@ static dl_result_t run_code(
 }
 
 //
-// PUBLIC
+// PUBLIC STACK
+//
+
+inline void vm_stack_push(
+    vm_t *vm,
+    value_t value
+) {
+    *vm->stack_top = value;
+    vm->stack_top++;
+}
+
+inline value_t vm_stack_pop(
+    vm_t *vm
+) {
+    vm->stack_top--;
+    return *vm->stack_top;
+}
+
+//
+// PUBLIC VM
 //
 
 void vm_init(
@@ -206,12 +224,16 @@ dl_result_t vm_interpret(
     chunk_t chunk;
     chunk_init(&chunk);
 
-    if (!compile(source, &chunk)) {
+    gc_t gc;
+    gc_init(&gc);
+
+    if (!compile(&gc, source, &chunk)) {
         chunk_free(&chunk);
         return DL_COMPILER_ERR;
     }
 
     vm->chunk = &chunk;
+    vm->gc = &gc;
     vm->b_ptr = vm->chunk->code;
 
     dl_result_t result = run_code(vm);
@@ -221,6 +243,8 @@ dl_result_t vm_interpret(
     }
 
     chunk_free(&chunk);
+    gc_free(&gc);
+
     return DL_OK;
 }
 
@@ -228,19 +252,4 @@ void vm_free(
     vm_t *vm
 ) {
 
-}
-
-inline void vm_stack_push(
-    vm_t *vm,
-    value_t value
-) {
-    *vm->stack_top = value;
-    vm->stack_top++;
-}
-
-inline value_t vm_stack_pop(
-    vm_t *vm
-) {
-    vm->stack_top--;
-    return *vm->stack_top;
 }

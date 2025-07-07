@@ -1,7 +1,7 @@
 #include "compiler.h"
 
 #include "types.h"
-#include "object.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -15,6 +15,7 @@
 
 typedef struct {
     lexer_t *scanner;
+    gc_t *gc;
     chunk_t *chunk;
     token_t curr;
     token_t prev;
@@ -246,7 +247,7 @@ static void _string(
     parser_t *parser
 ) {
     _emit_const(parser, OBJ_VAL(
-        copy_str(parser->prev.start + 1, parser->prev.length - 2)
+        copy_str(parser->gc, parser->prev.start + 1, parser->prev.length - 2)
     ));
 }
 
@@ -316,6 +317,7 @@ static void _binary(
 //
 
 bool compile(
+    gc_t *gc,
     const char *source,
     chunk_t *chunk
 ) {
@@ -324,6 +326,7 @@ bool compile(
 
     parser_t parser = (parser_t) {
         .scanner = &lexer,
+        .gc = gc,
         .chunk = chunk,
         .had_err = false,
         .panic_mode = false

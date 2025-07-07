@@ -3,7 +3,8 @@
 
 #include "chunk.h"
 #include "lexer.h"
+#include "gc.h"
 
-bool compile(const char *source, chunk_t *chunk);
+bool compile(gc_t *gc, const char *source, chunk_t *chunk);
 
 #endif //  _COMPILER_H_

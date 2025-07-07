@@ -2,6 +2,7 @@
 #define _MEMORY_H_
 
 #include "types.h"
+#include "object.h"
 
 //
 // ARRAY
@@ -25,6 +26,8 @@
 
 #define ALLOC(type, count) \
     (type*)mem_realloc(NULL, 0, sizeof(type) * (count))
+
+#define FREE(type, pointer) mem_realloc(pointer, sizeof(type), 0)
 
 void* mem_realloc(void *pointer, size_t old_size, size_t new_size);
 

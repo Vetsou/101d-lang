@@ -3,6 +3,7 @@
 
 #include "chunk.h"
 #include "err.h"
+#include "gc.h"
 
 #define STACK_MAX 4096
 
@@ -11,6 +12,7 @@ typedef struct {
     uint8_t *b_ptr;
     value_t stack[STACK_MAX];
     value_t *stack_top;
+    gc_t *gc;
 } vm_t;
 
 void vm_init(vm_t *vm);
