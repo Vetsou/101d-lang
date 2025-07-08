@@ -32,7 +32,7 @@ static obj_str_t* str_alloc(
     const char *chars,
     int32_t len
 ) {
-    size_t str_obj_size = sizeof(obj_str_t) + (len + 1) + sizeof(char);
+    size_t str_obj_size = sizeof(obj_str_t) + (len + 1) * sizeof(char);
     obj_str_t *str = (obj_str_t*)obj_alloc(gc, str_obj_size, OBJ_STRING);
     str->len = len;
 
