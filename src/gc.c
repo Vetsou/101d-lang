@@ -29,12 +29,16 @@ static obj_t* obj_alloc(
 
 static obj_str_t* str_alloc(
     gc_t *gc,
-    char *chars,
+    const char *chars,
     int32_t len
 ) {
-    obj_str_t *str = ALLOC_OBJ(gc, obj_str_t, OBJ_STRING);
+    size_t str_obj_size = sizeof(obj_str_t) + (len + 1) + sizeof(char);
+    obj_str_t *str = (obj_str_t*)obj_alloc(gc, str_obj_size, OBJ_STRING);
     str->len = len;
-    str->chars = chars;
+
+    memcpy(str->chars, chars, len);
+    str->chars[len] = '\0';
+
     return str;
 }
 
@@ -43,8 +47,6 @@ static void obj_free(
 ) {
     switch (obj->type) {
         case OBJ_STRING: {
-            obj_str_t *str = (obj_str_t*)obj;
-            ARRAY_FREE(char, str->chars, str->len + 1);
             FREE(obj_str_t, obj);
             break;
         }
@@ -78,10 +80,7 @@ obj_str_t* copy_str(
     const char *chars,
     int32_t len
 ) {
-    char *heap_chars = ALLOC(char, len + 1);
-    memcpy(heap_chars, chars, len);
-    heap_chars[len] = '\0';
-    return str_alloc(gc, heap_chars, len);
+    return str_alloc(gc, chars, len);
 }
 
 obj_str_t* take_str(
@@ -89,5 +88,7 @@ obj_str_t* take_str(
     char *chars,
     int32_t len
 ) {
-    return str_alloc(gc, chars, len);
+    obj_str_t *str = str_alloc(gc, chars, len);
+    ARRAY_FREE(char, chars, len + 1);
+    return str;
 }

@@ -24,7 +24,7 @@ void print_obj(value_t value);
 struct obj_str_t {
     obj_t obj;
     int32_t len;
-    char *chars;
+    char chars[];
 };
 
 static inline bool is_obj_type(value_t value, obj_type_t type) {
