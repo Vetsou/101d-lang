@@ -26,6 +26,11 @@ void test_mixed_expr() {
     TEST_ASSERT_EQUAL_INT(DL_OK, result);
 }
 
+void test_simple_string_expr() {
+    dl_result_t result = vm_interpret(&vm, "\"STR\" + \"ING\"");
+    TEST_ASSERT_EQUAL_INT(DL_OK, result);
+}
+
 int main(void) {
     printf("#################### [COMPILER TESTS] ####################\n");
     UNITY_BEGIN();
@@ -34,6 +39,7 @@ int main(void) {
     RUN_TEST(test_simple_bool_expr);
     RUN_TEST(test_simple_arithmetic_expr);
     RUN_TEST(test_mixed_expr);
+    RUN_TEST(test_simple_string_expr);
 
     return UNITY_END();
 }
